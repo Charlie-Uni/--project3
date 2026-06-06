@@ -1,4 +1,4 @@
-import { FileText, Loader2, RotateCcw, ScanText } from "lucide-react";
+import { BookOpen, FileText, Loader2, RotateCcw, ScanText } from "lucide-react";
 import { useMemo, useState } from "react";
 import { parseChapters, type ChapterPreview } from "./services/api";
 
@@ -63,6 +63,25 @@ function App() {
     }
   }
 
+  async function handleLoadSample() {
+    setIsChecking(true);
+    setError("");
+
+    try {
+      const response = await fetch("/sample_novel.txt");
+      if (!response.ok) {
+        throw new Error("示例文本加载失败");
+      }
+      const sampleText = await response.text();
+      setNovelText(sampleText);
+      setResult(EMPTY_RESULT);
+    } catch (sampleError) {
+      setError(sampleError instanceof Error ? sampleError.message : "示例文本加载失败");
+    } finally {
+      setIsChecking(false);
+    }
+  }
+
   function handleReset() {
     setNovelText("");
     setResult(EMPTY_RESULT);
@@ -95,6 +114,10 @@ function App() {
               spellCheck={false}
             />
             <div className="actions">
+              <button className="secondary-button" onClick={handleLoadSample} disabled={isChecking}>
+                <BookOpen size={18} />
+                加载示例
+              </button>
               <button className="primary-button" disabled={!canCheck} onClick={handleCheck}>
                 {isChecking ? <Loader2 className="spin" size={18} /> : <ScanText size={18} />}
                 校验章节
