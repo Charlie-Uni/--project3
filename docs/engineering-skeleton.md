@@ -35,7 +35,10 @@ ai-novel-to-script/
       main.tsx
     package.json
     vite.config.ts
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
   backend/
     app/
       api/
@@ -43,7 +46,10 @@ ai-novel-to-script/
       services/
       main.py
     requirements.txt
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
   prompts/
     system_prompt.txt
     user_prompt_template.txt
@@ -52,24 +58,38 @@ ai-novel-to-script/
     chapter_summary_prompt.txt
     character_prompt.txt
     scene_split_prompt.txt
+<<<<<<< Updated upstream
 
   schemas/
     script.schema.yaml
 
+=======
+  schemas/
+    script.schema.yaml
+>>>>>>> Stashed changes
   docs/
     schema-design.md
     ai-conversion.md
     engineering-skeleton.md
+<<<<<<< Updated upstream
 
   examples/
     sample_novel.txt
     sample_output.yaml
 
+=======
+  examples/
+    sample_novel.txt
+    sample_output.yaml
+>>>>>>> Stashed changes
   tests/
     backend/
       test_chapter_parser.py
       test_yaml_validation.py
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
   .env.example
   .gitignore
   README.md
