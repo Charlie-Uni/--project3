@@ -1,0 +1,51 @@
+请为下面的小说章节生成结构化章节摘要，用于后续小说转剧本。
+
+章节信息：
+- chapter_id：{chapter_id}
+- chapter_title：{chapter_title}
+
+已知人物表：
+{known_characters}
+
+输出要求：
+1. 只输出 YAML 正文。
+2. 不要输出 Markdown 代码块。
+3. 不要输出解释。
+4. 必须忠于原文，不要新增关键剧情。
+5. 如果人物身份或关系不确定，请在 notes 中标注。
+6. 如果出现人物别名、称谓或昵称，请记录到 character_mentions。
+7. 摘要需要保留事件顺序。
+8. 心理描写需要总结为人物情绪变化，不要直接扩写成新剧情。
+9. 对话只提取关键对白，不要完整复述所有台词。
+10. 输出字段必须使用以下结构：
+
+chapter_id: ""
+title: ""
+summary: ""
+character_mentions:
+  - name: ""
+    aliases: []
+    evidence: ""
+key_events:
+  - ""
+conflicts:
+  - ""
+important_dialogues:
+  - speaker: ""
+    line: ""
+    context: ""
+emotional_changes:
+  - character: ""
+    from: ""
+    to: ""
+    evidence: ""
+scene_candidates:
+  - location: ""
+    time: ""
+    characters_in_scene: []
+    summary: ""
+notes:
+  - ""
+
+章节原文：
+{chapter_text}

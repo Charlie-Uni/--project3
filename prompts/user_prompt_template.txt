@@ -1,0 +1,38 @@
+请将下面的多章节小说文本转换为结构化 YAML 剧本初稿。
+
+输入信息：
+- 原小说标题：{source_title}
+- 输入章节数：{chapter_count}
+- 输入字数：{word_count}
+- 目标剧本风格：{target_style}
+- 生成日期：{generated_at}
+
+Schema 摘要：
+{schema_summary}
+
+输出要求：
+1. 只输出 YAML 正文，不要输出 Markdown 代码块。
+2. 顶层字段必须包含 metadata、source_info、characters、chapters、script、global_notes。
+3. metadata 必须包含 title、version、generated_at、language、genre、target_format。
+4. source_info 必须包含 source_type、chapter_count、word_count、input_summary。
+5. characters 中每个人物必须包含 character_id、name、role、description、aliases、traits。
+6. chapters 中每章必须包含 chapter_id、title、summary。
+7. script.scenes 中每个场景必须包含 scene_id、source_chapter、location、time、characters_in_scene、summary、conflicts、plot_points、actions、dialogues、narration、emotions、transitions、notes。
+8. actions 中每项必须包含 actor 和 description。
+9. dialogues 中每项必须包含 speaker 和 line，可包含 emotion。
+10. narration 中每项必须包含 type 和 text。
+11. emotions 中每项必须包含 character、emotion、evidence。
+12. transitions 必须至少包含 type，可包含 next_scene_id 和 description。
+13. global_notes 必须说明整体改编策略、不确定内容和重要限制。
+14. 如果原文中某场景没有对白，dialogues 输出空数组。
+15. 如果某些信息原文未明确说明，不要编造，请在 notes 或 global_notes 标注。
+16. 心理描写需要转化为 narration、emotions 或可观察 actions。
+17. 保持原文主要人物关系、事件顺序和冲突逻辑。
+18. 不要新增原文没有依据的关键剧情。
+19. scene_id 使用 sc_001、sc_002 这样的格式。
+20. chapter_id 使用 ch_001、ch_002 这样的格式。
+21. character_id 使用 char_001、char_002 这样的格式。
+22. 输出必须是合法 YAML，并且字段类型符合 Schema。
+
+小说文本：
+{novel_text}

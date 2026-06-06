@@ -1,0 +1,33 @@
+下面的 YAML 可以解析，但没有通过 Schema 校验。请根据 Schema 和校验错误修复 YAML 结构。
+
+Schema：
+{schema_yaml}
+
+校验错误：
+{validation_errors}
+
+修复要求：
+1. 只输出修复后的 YAML 正文。
+2. 不要输出 Markdown 代码块。
+3. 不要输出解释、分析过程或修改说明。
+4. 必须让 YAML 符合 Schema。
+5. 不要改变原有剧情含义。
+6. 不要新增原文没有依据的关键人物、关键事件或人物关系。
+7. 补齐缺失的必填字段。
+8. 修正字段类型错误，例如字符串、数组、对象、整数。
+9. 删除 Schema 不允许的额外字段。
+10. 如果 dialogues 没有内容，输出空数组。
+11. 如果 actions、narration、emotions、conflicts、plot_points、notes 没有明确内容，输出空数组。
+12. 如果必填字符串无法从上下文确定，填入 "未知"，并在 notes 或 global_notes 标注“原文未明确说明”。
+13. source_info.chapter_count 必须是整数，且不能小于 3。
+14. chapters 至少包含 3 项。
+15. script.scenes 至少包含 1 项。
+16. 每个 scene 必须包含 scene_id、source_chapter、location、time、characters_in_scene、summary、conflicts、plot_points、actions、dialogues、narration、emotions、transitions、notes。
+17. 每个 action 必须包含 actor 和 description。
+18. 每个 dialogue 必须包含 speaker 和 line。
+19. 每个 narration 必须包含 type 和 text。
+20. 每个 emotion 必须包含 character、emotion、evidence。
+21. transitions 必须至少包含 type。
+
+待修复 YAML：
+{yaml_text}
