@@ -15,6 +15,14 @@ export type ParseChaptersData = {
   chapters: ChapterPreview[];
 };
 
+export type ValidateYamlData = {
+  is_parseable: boolean;
+  is_valid: boolean;
+  message: string;
+  errors: string[];
+  top_level_fields: string[];
+};
+
 export type ApiResponse<T> = {
   success: boolean;
   data: T | null;
@@ -34,6 +42,24 @@ export async function parseChapters(novelText: string): Promise<ApiResponse<Pars
 
   if (!response.ok) {
     throw new Error(`章节校验接口异常: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function validateYaml(yamlText: string): Promise<ApiResponse<ValidateYamlData>> {
+  const response = await fetch(`${API_BASE_URL}/api/validate-yaml`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      yaml_text: yamlText
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`YAML 校验接口异常: ${response.status}`);
   }
 
   return response.json();
