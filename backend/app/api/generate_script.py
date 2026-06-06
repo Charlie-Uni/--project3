@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import yaml
 from fastapi import APIRouter, HTTPException
@@ -27,8 +27,8 @@ class GenerateScriptRequest(BaseModel):
 
 class ApiResponse(BaseModel):
     success: bool
-    data: dict[str, Any] | None = None
-    error: str | None = None
+    data: Optional[dict[str, Any]] = None
+    error: Optional[str] = None
 
 
 def load_text_file(path: Path) -> str:

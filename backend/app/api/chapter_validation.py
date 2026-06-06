@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -14,8 +14,8 @@ class ParseChaptersRequest(BaseModel):
 
 class ApiResponse(BaseModel):
     success: bool
-    data: dict[str, Any] | None = None
-    error: str | None = None
+    data: Optional[dict[str, Any]] = None
+    error: Optional[str] = None
 
 
 @router.post("/parse-chapters", response_model=ApiResponse)
