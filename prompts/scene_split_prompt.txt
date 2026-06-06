@@ -1,0 +1,67 @@
+请将下面的小说章节拆分为剧本场景候选，用于生成最终 script.scenes。
+
+章节信息：
+- chapter_id：{chapter_id}
+- chapter_title：{chapter_title}
+- 建议最多场景数：{max_scene_count}
+
+章节摘要：
+{chapter_summary}
+
+统一人物表：
+{characters}
+
+章节原文：
+{chapter_text}
+
+拆分规则：
+1. 只输出 YAML 正文。
+2. 不要输出 Markdown 代码块。
+3. 不要输出解释。
+4. 按地点变化、时间变化、人物组合变化、事件阶段变化拆分场景。
+5. 不要把同一地点同一时间的连续事件拆得过碎。
+6. 不要把明显不同地点或时间的事件合并到一个场景。
+7. 每个场景必须能对应原文依据。
+8. 没有明确地点时 location 写 "未知"，并在 notes 说明。
+9. 没有明确时间时 time 写 "未知"，并在 notes 说明。
+10. 对白必须来自原文直接发言或非常贴近原文的剧本化压缩。
+11. 不要为了增加戏剧性新增原文没有的冲突。
+12. 心理描写优先转为 emotions、narration 或 notes。
+13. actions 必须是可观察、可表演的行为。
+14. narration 用于环境描写、背景说明和必要旁白。
+15. conflicts 写当前场景的阻碍、对立、信息差或内心拉扯。
+16. plot_points 写推动剧情发展的关键事件。
+17. scene_id 使用 sc_001、sc_002 格式。如果这是某章内部拆分，也可以先使用临时编号，最终合并时再统一编号。
+18. 输出字段必须使用以下结构：
+
+scenes:
+  - scene_id: ""
+    source_chapter: "{chapter_id}"
+    location: ""
+    time: ""
+    characters_in_scene: []
+    summary: ""
+    conflicts: []
+    plot_points: []
+    actions:
+      - actor: ""
+        description: ""
+    dialogues:
+      - speaker: ""
+        line: ""
+        emotion: ""
+    narration:
+      - type: ""
+        text: ""
+    emotions:
+      - character: ""
+        emotion: ""
+        evidence: ""
+    transitions:
+      type: ""
+      next_scene_id: ""
+      description: ""
+    notes:
+      - ""
+
+请输出场景拆分结果：

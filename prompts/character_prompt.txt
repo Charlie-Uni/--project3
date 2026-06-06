@@ -1,0 +1,43 @@
+请根据小说内容生成统一人物表，用于后续剧本 YAML 生成。
+
+原小说标题：
+{source_title}
+
+章节摘要：
+{chapter_summaries}
+
+必要原文片段：
+{novel_excerpt}
+
+输出要求：
+1. 只输出 YAML 正文。
+2. 不要输出 Markdown 代码块。
+3. 不要输出解释。
+4. 必须忠于原文，不要编造人物关系。
+5. 只提取对剧情有作用的人物。
+6. 人物姓名使用最稳定、最正式的称呼。
+7. 昵称、称谓、代称写入 aliases。
+8. 如果人物身份不确定，在 description 中说明“原文未明确说明”。
+9. 如果人物关系不确定，在 global_notes 中说明，不要写成确定事实。
+10. traits 只写原文能支持的性格或状态。
+11. character_id 使用 char_001、char_002 格式。
+12. 输出字段必须使用以下结构：
+
+characters:
+  - character_id: ""
+    name: ""
+    role: ""
+    description: ""
+    aliases: []
+    traits: []
+global_notes:
+  - ""
+
+角色定位 role 可选：
+- protagonist
+- supporting
+- antagonist
+- minor
+- unknown
+
+请输出人物表：
