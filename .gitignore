@@ -1,0 +1,43 @@
+# env
+.env
+.env.local
+.env.*.local
+
+# dependencies
+node_modules/
+.venv/
+venv/
+env/
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# logs
+*.log
+logs/
+
+# build outputs
+dist/
+build/
+coverage/
+htmlcov/
+
+# frontend cache
+.vite/
+.cache/
+
+# backend outputs
+outputs/
+tmp/
+
+# system
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
