@@ -141,6 +141,25 @@ function App() {
     setYamlError("");
   }
 
+  async function handleLoadSampleYaml() {
+    setIsValidatingYaml(true);
+    setYamlError("");
+
+    try {
+      const response = await fetch("/sample_output.yaml");
+      if (!response.ok) {
+        throw new Error("示例 YAML 加载失败");
+      }
+      const sampleYaml = await response.text();
+      setYamlText(sampleYaml);
+      setYamlResult(EMPTY_YAML_RESULT);
+    } catch (sampleError) {
+      setYamlError(sampleError instanceof Error ? sampleError.message : "示例 YAML 加载失败");
+    } finally {
+      setIsValidatingYaml(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="workspace">
@@ -239,6 +258,10 @@ function App() {
                 spellCheck={false}
               />
               <div className="actions">
+                <button className="secondary-button" onClick={handleLoadSampleYaml} disabled={isValidatingYaml}>
+                  <BookOpen size={18} />
+                  加载示例 YAML
+                </button>
                 <button className="primary-button" disabled={!canValidateYaml} onClick={handleValidateYaml}>
                   {isValidatingYaml ? <Loader2 className="spin" size={18} /> : <CheckCircle2 size={18} />}
                   校验 YAML

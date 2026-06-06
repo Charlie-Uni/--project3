@@ -1,0 +1,117 @@
+metadata:
+  title: "雨夜来信"
+  version: "1.0.0"
+  generated_at: "2026-06-06"
+  language: "zh-CN"
+  genre: "modern_drama"
+  target_format: "screenplay_yaml"
+source_info:
+  source_type: "novel"
+  chapter_count: 3
+  word_count: 4860
+  input_summary: "三章现代悬疑情感小说，围绕林夏、顾沉和一封旧信展开。"
+characters:
+  - character_id: "char_001"
+    name: "林夏"
+    role: "protagonist"
+    description: "出版社编辑，理性克制，对七年前的事故仍有回避。"
+    aliases: ["小夏"]
+    traits: ["敏感", "克制", "责任感强"]
+  - character_id: "char_002"
+    name: "顾沉"
+    role: "supporting"
+    description: "多年未归的旧友，带着关键线索回到城市。"
+    aliases: ["阿沉"]
+    traits: ["沉默", "内疚"]
+  - character_id: "char_003"
+    name: "周砚"
+    role: "supporting"
+    description: "林夏的同事，知道当年事件的部分真相。"
+    aliases: []
+    traits: ["谨慎", "观察力强"]
+chapters:
+  - chapter_id: "ch_001"
+    title: "第一章 雨夜"
+    summary: "林夏在雨夜加班，顾沉突然出现，并交给她一封旧信。"
+  - chapter_id: "ch_002"
+    title: "第二章 信封"
+    summary: "林夏读到信中线索，意识到七年前的事故可能并非意外。"
+  - chapter_id: "ch_003"
+    title: "第三章 旧楼"
+    summary: "林夏和顾沉前往旧楼寻找证据，周砚的态度变得异常。"
+script:
+  scenes:
+    - scene_id: "sc_001"
+      source_chapter: "ch_001"
+      location: "出版社办公室"
+      time: "夜晚"
+      characters_in_scene: ["林夏"]
+      summary: "林夏独自在办公室加班，暴雨让她想起七年前的事故。"
+      conflicts:
+        - "林夏想保持理性工作，但旧事记忆不断干扰她。"
+      plot_points:
+        - "林夏发现窗外雨势和七年前事故当晚相似。"
+        - "她看到抽屉里未寄出的旧明信片。"
+      actions:
+        - actor: "林夏"
+          description: "合上稿件，揉了揉眉心，视线停在抽屉缝隙。"
+        - actor: "林夏"
+          description: "拉开抽屉，拿出一张已经泛黄的明信片。"
+      dialogues: []
+      narration:
+        - type: "voice_over"
+          text: "七年前的那个雨夜之后，林夏再也没有主动提起顾沉。"
+      emotions:
+        - character: "林夏"
+          emotion: "疲惫、压抑"
+          evidence: "原文中她反复看向雨幕，并下意识避开旧明信片。"
+      transitions:
+        type: "cut"
+        next_scene_id: "sc_002"
+        description: "门外响起急促敲门声。"
+      notes:
+        - "原文大量心理描写被转为旁白和动作，避免直接堆内心独白。"
+    - scene_id: "sc_002"
+      source_chapter: "ch_001"
+      location: "出版社门口"
+      time: "夜晚"
+      characters_in_scene: ["林夏", "顾沉"]
+      summary: "顾沉在雨中出现，将一封旧信交给林夏。"
+      conflicts:
+        - "林夏不愿面对顾沉回归，顾沉急于让她看到信中线索。"
+      plot_points:
+        - "顾沉突然出现。"
+        - "旧信成为后续调查七年前事故的触发点。"
+      actions:
+        - actor: "林夏"
+          description: "打开门后停住，握着门把的手明显僵硬。"
+        - actor: "顾沉"
+          description: "把湿透的外套拉紧，从怀里取出信封递给她。"
+      dialogues:
+        - speaker: "林夏"
+          line: "你为什么回来？"
+          emotion: "震惊、克制"
+        - speaker: "顾沉"
+          line: "这封信，你应该看看。"
+          emotion: "沉重、迟疑"
+      narration:
+        - type: "scene_description"
+          text: "雨水顺着顾沉的发梢落下，信封却被他护得很干。"
+      emotions:
+        - character: "林夏"
+          emotion: "抗拒、动摇"
+          evidence: "原文中她想关门，却没有松开门把。"
+        - character: "顾沉"
+          emotion: "内疚"
+          evidence: "原文中他避开林夏的目光。"
+      transitions:
+        type: "fade_out"
+        next_scene_id: "sc_003"
+        description: "镜头停在信封上，雨声逐渐放大。"
+      notes:
+        - "顾沉未解释全部真相，保留悬念。"
+        - "台词基本保留原文，只压缩了重复语气词。"
+global_notes:
+  - "本 YAML 仅展开两个场景，用于展示小说到剧本的结构转换。"
+  - "心理描写优先转为 actions、narration、emotions 和 notes。"
+  - "未在原文明确出现的信息不新增为关键情节。"
