@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.chapter_validation import router as chapter_validation_router
 from backend.app.api.generate_script import router as generate_script_router
+from backend.app.api.yaml_validation import router as yaml_validation_router
 
 
 app = FastAPI(
@@ -24,6 +25,7 @@ app.add_middleware(
 
 app.include_router(chapter_validation_router, prefix="/api", tags=["chapters"])
 app.include_router(generate_script_router, prefix="/api", tags=["scripts"])
+app.include_router(yaml_validation_router, prefix="/api", tags=["yaml"])
 
 
 @app.get("/api/health")
