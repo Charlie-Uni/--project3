@@ -477,6 +477,49 @@ textarea:focus {
   gap: 10px;
 }
 
+/* ── YAML 全宽布局 ── */
+.yaml-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.yaml-input-panel {
+  padding: 18px;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.yaml-textarea {
+  min-height: 220px !important;
+}
+
+.yaml-result-panel {
+  padding: 18px;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.yaml-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.yaml-metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  flex: 1;
+  min-width: 0;
+}
+
+.yaml-card-grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+}
+
 .chapter-card {
   padding: 14px;
   border: 1px solid var(--glass-border);
