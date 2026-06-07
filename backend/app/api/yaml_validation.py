@@ -30,6 +30,9 @@ def validate_yaml_endpoint(request: ValidateYamlRequest) -> ApiResponse:
             "message": result.message,
             "errors": result.errors,
             "top_level_fields": result.top_level_fields,
+            "summary": result.summary,
+            "characters_preview": result.characters_preview,
+            "scenes_preview": result.scenes_preview,
         },
         error=None,
     )
