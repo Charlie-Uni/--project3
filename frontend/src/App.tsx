@@ -17,6 +17,7 @@ import {
   type ChapterPreview,
   type ValidateYamlData
 } from "./services/api";
+import { StickmanSceneDemo } from "./components/StickmanSceneDemo";
 
 type ValidationState = {
   chapterCount: number;
@@ -461,6 +462,7 @@ function App() {
                   <p key={validationError}>{validationError}</p>
                 ))}
               </div>
+              <StickmanSceneDemo scenes={yamlResult.scenes_preview} />
               <div className="preview-section">
                 <div className="panel-heading compact-heading">
                   <h2>人物表</h2>

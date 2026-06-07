@@ -42,6 +42,34 @@ export type ScriptCharacterPreview = {
   traits: string[];
 };
 
+export type ScriptActionPreview = {
+  actor: string;
+  description: string;
+};
+
+export type ScriptDialoguePreview = {
+  speaker: string;
+  line: string;
+  emotion: string;
+};
+
+export type ScriptNarrationPreview = {
+  type: string;
+  text: string;
+};
+
+export type ScriptEmotionPreview = {
+  character: string;
+  emotion: string;
+  evidence: string;
+};
+
+export type ScriptTransitionPreview = {
+  type: string;
+  next_scene_id: string;
+  description: string;
+};
+
 export type ScriptScenePreview = {
   scene_id: string;
   source_chapter: string;
@@ -50,6 +78,13 @@ export type ScriptScenePreview = {
   summary: string;
   characters_in_scene: string[];
   dialogue_count: number;
+  conflicts: string[];
+  plot_points: string[];
+  actions: ScriptActionPreview[];
+  dialogues: ScriptDialoguePreview[];
+  narration: ScriptNarrationPreview[];
+  emotions: ScriptEmotionPreview[];
+  transition: ScriptTransitionPreview;
 };
 
 export type GenerateScriptData = {
