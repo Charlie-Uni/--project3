@@ -38,7 +38,15 @@ const EMPTY_YAML_RESULT: ValidateYamlData = {
   is_valid: false,
   message: "等待输入 YAML 文本",
   errors: [],
-  top_level_fields: []
+  top_level_fields: [],
+  summary: {
+    character_count: 0,
+    chapter_count: 0,
+    scene_count: 0,
+    dialogue_count: 0
+  },
+  characters_preview: [],
+  scenes_preview: []
 };
 
 type WorkMode = "novel" | "yaml";
@@ -150,16 +158,22 @@ function App() {
       }
 
       setYamlText(response.data.yaml_text);
-      setYamlResult({
-        is_parseable: true,
-        is_valid: response.data.validation_errors.length === 0,
-        message:
-          response.data.validation_errors.length === 0
-            ? "AI 生成结果已通过 Schema 校验"
-            : "AI 生成结果未通过 Schema 校验",
-        errors: response.data.validation_errors,
-        top_level_fields: Object.keys(response.data.parsed)
-      });
+      const validationResponse = await validateYaml(response.data.yaml_text);
+      if (validationResponse.success && validationResponse.data) {
+        setYamlResult(validationResponse.data);
+      } else {
+        setYamlResult({
+          ...EMPTY_YAML_RESULT,
+          is_parseable: true,
+          is_valid: response.data.validation_errors.length === 0,
+          message:
+            response.data.validation_errors.length === 0
+              ? "AI 生成结果已通过 Schema 校验"
+              : "AI 生成结果未通过 Schema 校验",
+          errors: response.data.validation_errors,
+          top_level_fields: Object.keys(response.data.parsed)
+        });
+      }
       setGenerationMessage(
         response.data.used_mock
           ? "已使用示例 YAML 生成结果，可在接入 API Key 后切换为真实 AI 生成。"
@@ -385,6 +399,14 @@ function App() {
                   <span>Schema 状态</span>
                   <strong>{yamlResult.is_valid ? "通过" : "未通过"}</strong>
                 </div>
+                <div>
+                  <span>人物数</span>
+                  <strong>{yamlResult.summary.character_count}</strong>
+                </div>
+                <div>
+                  <span>场景数</span>
+                  <strong>{yamlResult.summary.scene_count}</strong>
+                </div>
               </div>
               <p className={yamlError ? "message error" : yamlResult.is_valid ? "message success" : "message"}>
                 {yamlError || yamlResult.message}
@@ -398,6 +420,50 @@ function App() {
                 {yamlResult.errors.map((validationError) => (
                   <p key={validationError}>{validationError}</p>
                 ))}
+              </div>
+              <div className="preview-section">
+                <div className="panel-heading compact-heading">
+                  <h2>人物表</h2>
+                </div>
+                <div className="character-grid">
+                  {yamlResult.characters_preview.map((character) => (
+                    <article key={character.name} className="preview-card">
+                      <div>
+                        <strong>{character.name}</strong>
+                        <span>{character.role}</span>
+                      </div>
+                      <p>{character.description || "暂无人物说明"}</p>
+                      <div className="tag-row">
+                        {character.traits.map((trait) => (
+                          <span key={trait}>{trait}</span>
+                        ))}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <div className="preview-section">
+                <div className="panel-heading compact-heading">
+                  <h2>场景卡片</h2>
+                </div>
+                <div className="scene-grid">
+                  {yamlResult.scenes_preview.map((scene) => (
+                    <article key={scene.scene_id} className="preview-card">
+                      <div>
+                        <strong>{scene.scene_id}</strong>
+                        <span>{scene.source_chapter}</span>
+                      </div>
+                      <p>{scene.location} / {scene.time}</p>
+                      <p>{scene.summary || "暂无场景摘要"}</p>
+                      <div className="tag-row">
+                        {scene.characters_in_scene.map((character) => (
+                          <span key={character}>{character}</span>
+                        ))}
+                        <span>{scene.dialogue_count} 句对白</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
             </section>
           </div>

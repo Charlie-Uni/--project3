@@ -300,6 +300,58 @@ textarea:focus {
   line-height: 1.5;
 }
 
+.preview-section {
+  margin-top: 18px;
+}
+
+.compact-heading {
+  margin-bottom: 10px;
+}
+
+.character-grid,
+.scene-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.preview-card {
+  padding: 14px;
+  border: 1px solid #e1e7ee;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.preview-card div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.preview-card p {
+  margin: 0 0 8px;
+  color: #63717d;
+  line-height: 1.55;
+}
+
+.preview-card span {
+  color: #63717d;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-row span {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #eef3ff;
+  color: #1f4fc5;
+  font-size: 12px;
+}
+
 .spin {
   animation: spin 1s linear infinite;
 }

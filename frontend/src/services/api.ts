@@ -21,6 +21,33 @@ export type ValidateYamlData = {
   message: string;
   errors: string[];
   top_level_fields: string[];
+  summary: ScriptSummary;
+  characters_preview: ScriptCharacterPreview[];
+  scenes_preview: ScriptScenePreview[];
+};
+
+export type ScriptSummary = {
+  character_count: number;
+  chapter_count: number;
+  scene_count: number;
+  dialogue_count: number;
+};
+
+export type ScriptCharacterPreview = {
+  name: string;
+  role: string;
+  description: string;
+  traits: string[];
+};
+
+export type ScriptScenePreview = {
+  scene_id: string;
+  source_chapter: string;
+  location: string;
+  time: string;
+  summary: string;
+  characters_in_scene: string[];
+  dialogue_count: number;
 };
 
 export type GenerateScriptData = {
