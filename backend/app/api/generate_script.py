@@ -19,6 +19,7 @@ class GenerateScriptRequest(BaseModel):
     novel_text: str = Field(..., min_length=1)
     source_title: str = "未命名小说"
     target_style: str = "screenplay_yaml"
+    provider: str = "openai"
 
 
 class ApiResponse(BaseModel):
@@ -35,6 +36,7 @@ async def generate_script(request: GenerateScriptRequest) -> ApiResponse:
                 novel_text=request.novel_text,
                 source_title=request.source_title,
                 target_style=request.target_style,
+                provider=request.provider,
             )
         )
     except ChapterRequirementError as exc:
@@ -56,6 +58,8 @@ async def generate_script(request: GenerateScriptRequest) -> ApiResponse:
             "chapter_count": result.chapter_count,
             "word_count": result.word_count,
             "used_mock": result.used_mock,
+            "provider": result.provider,
+            "model": result.model,
         },
         error="YAML 已生成，但未通过 Schema 校验" if has_validation_errors else None,
     )
