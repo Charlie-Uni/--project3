@@ -6,9 +6,10 @@ import {
   Loader2,
   RotateCcw,
   ScanText,
+  Upload,
   WandSparkles
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   generateScript,
   parseChapters,
@@ -90,6 +91,10 @@ function App() {
   const [yamlResult, setYamlResult] = useState<ValidateYamlData>(EMPTY_YAML_RESULT);
   const [yamlError, setYamlError] = useState("");
   const [isValidatingYaml, setIsValidatingYaml] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({ type: "idle", message: "" });
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canCheck = novelText.trim().length > 0 && !isChecking;
   const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
@@ -152,6 +157,52 @@ function App() {
     setResult(EMPTY_RESULT);
     setError("");
     setGenerationMessage("");
+    setUploadStatus({ type: "idle", message: "" });
+  }
+
+  function handleFileUpload(file: File) {
+    if (!file.name.endsWith(".txt")) {
+      setUploadStatus({ type: "error", message: "仅支持 .txt 文件" });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result;
+      if (typeof text === "string") {
+        setNovelText(text);
+        setResult(EMPTY_RESULT);
+        setGenerationMessage("");
+        setError("");
+        const sizeKb = (file.size / 1024).toFixed(1);
+        setUploadStatus({ type: "success", message: `${file.name} (${sizeKb} KB)` });
+      }
+    };
+    reader.onerror = () => {
+      setUploadStatus({ type: "error", message: "文件读取失败" });
+    };
+    reader.readAsText(file, "utf-8");
+  }
+
+  function handleFileInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) handleFileUpload(file);
+    event.target.value = "";
+  }
+
+  function handleDragOver(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsDragOver(true);
+  }
+
+  function handleDragLeave() {
+    setIsDragOver(false);
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsDragOver(false);
+    const file = event.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
   }
 
   async function handleGenerateScript() {
@@ -310,6 +361,33 @@ function App() {
                   </button>
                 ))}
               </div>
+            </div>
+            <div
+              className={`upload-zone${isDragOver ? " drag-over" : ""}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <Upload size={16} />
+              <span className="upload-zone-hint">拖拽 .txt 文件至此，或</span>
+              <button
+                type="button"
+                className="upload-trigger"
+                disabled={isChecking}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                点击上传
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".txt"
+                className="file-input-hidden"
+                onChange={handleFileInputChange}
+              />
+              {uploadStatus.message ? (
+                <span className={`upload-status ${uploadStatus.type}`}>{uploadStatus.message}</span>
+              ) : null}
             </div>
             <textarea
               value={novelText}
