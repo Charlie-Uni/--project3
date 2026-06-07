@@ -53,6 +53,7 @@ const EMPTY_YAML_RESULT: ValidateYamlData = {
 };
 
 type WorkMode = "novel" | "yaml";
+type WorkflowStepState = "done" | "current" | "pending";
 
 const AI_PROVIDER_OPTIONS: Array<{ value: AiProvider; label: string; description: string }> = [
   {
@@ -74,6 +75,10 @@ const AI_PROVIDER_OPTIONS: Array<{ value: AiProvider; label: string; description
 
 function getProviderLabel(provider: AiProvider) {
   return AI_PROVIDER_OPTIONS.find((option) => option.value === provider)?.label || provider;
+}
+
+function getStepClass(state: WorkflowStepState) {
+  return `workflow-step ${state}`;
 }
 
 function App() {
@@ -107,6 +112,33 @@ function App() {
     if (error) return "校验失败";
     return result.isValid ? "可生成剧本" : "需要补充章节";
   }, [error, isChecking, isValidatingYaml, mode, result.isValid, yamlError, yamlResult.is_valid]);
+
+  const workflowSteps = useMemo(
+    () =>
+      [
+        {
+          label: "输入小说",
+          state: novelText.trim() ? "done" : "current"
+        },
+        {
+          label: "章节校验",
+          state: result.isValid ? "done" : novelText.trim() ? "current" : "pending"
+        },
+        {
+          label: "生成 YAML",
+          state: yamlText.trim() ? "done" : result.isValid ? "current" : "pending"
+        },
+        {
+          label: "Schema 校验",
+          state: yamlResult.is_valid ? "done" : yamlText.trim() ? "current" : "pending"
+        },
+        {
+          label: "预览导出",
+          state: yamlResult.is_valid ? "current" : "pending"
+        }
+      ] satisfies Array<{ label: string; state: WorkflowStepState }>,
+    [novelText, result.isValid, yamlResult.is_valid, yamlText]
+  );
 
   async function handleCheck() {
     if (!novelText.trim()) {
@@ -292,6 +324,15 @@ function App() {
             {statusLabel}
           </div>
         </header>
+
+        <section className="workflow-steps" aria-label="剧本生成流程">
+          {workflowSteps.map((step, index) => (
+            <div key={step.label} className={getStepClass(step.state)}>
+              <span>{step.state === "done" ? <Check size={14} /> : index + 1}</span>
+              <strong>{step.label}</strong>
+            </div>
+          ))}
+        </section>
 
         <nav className="mode-tabs" aria-label="功能切换">
           <button className={mode === "novel" ? "active" : ""} onClick={() => setMode("novel")}>

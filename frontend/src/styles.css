@@ -95,6 +95,68 @@ h2 {
   gap: 18px;
 }
 
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.workflow-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #dfe5ec;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #63717d;
+}
+
+.workflow-step span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #eef1f5;
+  color: #63717d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.workflow-step strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.workflow-step.done {
+  border-color: #b7e4d1;
+  background: #f1fbf6;
+  color: #16714f;
+}
+
+.workflow-step.done span {
+  background: #2f9e74;
+  color: #ffffff;
+}
+
+.workflow-step.current {
+  border-color: #94b4ff;
+  background: #eef3ff;
+  color: #1f4fc5;
+}
+
+.workflow-step.current span {
+  background: #2357d9;
+  color: #ffffff;
+}
+
 .mode-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -838,6 +900,10 @@ textarea:focus {
 
   .layout-grid {
     grid-template-columns: 1fr;
+  }
+
+  .workflow-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .input-panel,
