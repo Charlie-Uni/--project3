@@ -772,3 +772,36 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Scene Demo 独立页 ── */
+.scene-demo-page {
+  padding: 8px 0;
+}
+
+.scene-demo-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 360px;
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  color: var(--text-muted);
+}
+
+.scene-demo-empty-icon {
+  color: var(--accent);
+  opacity: 0.5;
+}
+
+.scene-demo-empty p {
+  margin: 0;
+  font-size: 15px;
+  max-width: 420px;
+  line-height: 1.6;
+}
