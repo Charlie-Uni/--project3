@@ -23,6 +23,15 @@ export type ValidateYamlData = {
   top_level_fields: string[];
 };
 
+export type GenerateScriptData = {
+  yaml_text: string;
+  parsed: Record<string, unknown>;
+  validation_errors: string[];
+  chapter_count: number;
+  word_count: number;
+  used_mock: boolean;
+};
+
 export type ApiResponse<T> = {
   success: boolean;
   data: T | null;
@@ -60,6 +69,31 @@ export async function validateYaml(yamlText: string): Promise<ApiResponse<Valida
 
   if (!response.ok) {
     throw new Error(`YAML 校验接口异常: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function generateScript(
+  novelText: string,
+  sourceTitle: string,
+  targetStyle = "screenplay_yaml"
+): Promise<ApiResponse<GenerateScriptData>> {
+  const response = await fetch(`${API_BASE_URL}/api/generate-script`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      novel_text: novelText,
+      source_title: sourceTitle || "未命名小说",
+      target_style: targetStyle
+    })
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null);
+    throw new Error(errorBody?.detail || `AI 剧本生成接口异常: ${response.status}`);
   }
 
   return response.json();
