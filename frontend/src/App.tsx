@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  Check,
   CheckCircle2,
   Download,
   FileText,
@@ -329,6 +330,9 @@ function App() {
                     className={selectedProvider === option.value ? "active" : ""}
                     onClick={() => setSelectedProvider(option.value)}
                   >
+                    {selectedProvider === option.value && (
+                      <Check size={13} className="provider-check" />
+                    )}
                     <strong>{option.label}</strong>
                     <small>{option.description}</small>
                   </button>

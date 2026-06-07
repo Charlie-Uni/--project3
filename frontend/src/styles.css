@@ -202,6 +202,7 @@ textarea:focus {
 }
 
 .provider-options button {
+  position: relative;
   min-height: 58px;
   padding: 9px 10px;
   border: 1px solid #d3dbe3;
@@ -210,12 +211,26 @@ textarea:focus {
   color: #42505c;
   text-align: left;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.provider-options button:hover:not(.active) {
+  background: #f4f6f9;
+  border-color: #b8c2cc;
 }
 
 .provider-options button.active {
   border-color: #2357d9;
   background: #eef3ff;
   color: #1f4fc5;
+  box-shadow: inset 0 0 0 1px #2357d9;
+}
+
+.provider-check {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  color: #2357d9;
 }
 
 .provider-options strong,
