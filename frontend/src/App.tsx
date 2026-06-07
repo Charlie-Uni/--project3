@@ -1,6 +1,20 @@
-import { BookOpen, CheckCircle2, FileText, Loader2, RotateCcw, ScanText } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  RotateCcw,
+  ScanText,
+  WandSparkles
+} from "lucide-react";
 import { useMemo, useState } from "react";
-import { parseChapters, validateYaml, type ChapterPreview, type ValidateYamlData } from "./services/api";
+import {
+  generateScript,
+  parseChapters,
+  validateYaml,
+  type ChapterPreview,
+  type ValidateYamlData
+} from "./services/api";
 
 type ValidationState = {
   chapterCount: number;
@@ -30,16 +44,20 @@ type WorkMode = "novel" | "yaml";
 
 function App() {
   const [mode, setMode] = useState<WorkMode>("novel");
+  const [sourceTitle, setSourceTitle] = useState("雨夜来信");
   const [novelText, setNovelText] = useState("");
   const [result, setResult] = useState<ValidationState>(EMPTY_RESULT);
   const [error, setError] = useState("");
   const [isChecking, setIsChecking] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationMessage, setGenerationMessage] = useState("");
   const [yamlText, setYamlText] = useState("");
   const [yamlResult, setYamlResult] = useState<ValidateYamlData>(EMPTY_YAML_RESULT);
   const [yamlError, setYamlError] = useState("");
   const [isValidatingYaml, setIsValidatingYaml] = useState(false);
 
   const canCheck = novelText.trim().length > 0 && !isChecking;
+  const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
   const canValidateYaml = yamlText.trim().length > 0 && !isValidatingYaml;
   const isCurrentModeValid = mode === "yaml" ? yamlResult.is_valid : result.isValid;
 
@@ -97,7 +115,9 @@ function App() {
       }
       const sampleText = await response.text();
       setNovelText(sampleText);
+      setSourceTitle("雨夜来信");
       setResult(EMPTY_RESULT);
+      setGenerationMessage("");
     } catch (sampleError) {
       setError(sampleError instanceof Error ? sampleError.message : "示例文本加载失败");
     } finally {
@@ -109,6 +129,47 @@ function App() {
     setNovelText("");
     setResult(EMPTY_RESULT);
     setError("");
+    setGenerationMessage("");
+  }
+
+  async function handleGenerateScript() {
+    if (!result.isValid) {
+      setError("请先完成章节校验，并确保小说不少于 3 章");
+      return;
+    }
+
+    setIsGenerating(true);
+    setError("");
+    setGenerationMessage("");
+
+    try {
+      const response = await generateScript(novelText, sourceTitle);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "AI 剧本生成失败");
+      }
+
+      setYamlText(response.data.yaml_text);
+      setYamlResult({
+        is_parseable: true,
+        is_valid: response.data.validation_errors.length === 0,
+        message:
+          response.data.validation_errors.length === 0
+            ? "AI 生成结果已通过 Schema 校验"
+            : "AI 生成结果未通过 Schema 校验",
+        errors: response.data.validation_errors,
+        top_level_fields: Object.keys(response.data.parsed)
+      });
+      setGenerationMessage(
+        response.data.used_mock
+          ? "已使用示例 YAML 生成结果，可在接入 API Key 后切换为真实 AI 生成。"
+          : "AI 剧本 YAML 已生成。"
+      );
+      setMode("yaml");
+    } catch (generateError) {
+      setError(generateError instanceof Error ? generateError.message : "AI 剧本生成失败");
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   async function handleValidateYaml() {
@@ -191,6 +252,15 @@ function App() {
               <FileText size={20} />
               <h2>小说文本</h2>
             </div>
+            <label className="field-label" htmlFor="source-title">
+              小说标题
+            </label>
+            <input
+              id="source-title"
+              value={sourceTitle}
+              onChange={(event) => setSourceTitle(event.target.value)}
+              placeholder="请输入小说标题"
+            />
             <textarea
               value={novelText}
               onChange={(event) => setNovelText(event.target.value)}
@@ -205,6 +275,10 @@ function App() {
               <button className="primary-button" disabled={!canCheck} onClick={handleCheck}>
                 {isChecking ? <Loader2 className="spin" size={18} /> : <ScanText size={18} />}
                 校验章节
+              </button>
+              <button className="primary-button" disabled={!canGenerate} onClick={handleGenerateScript}>
+                {isGenerating ? <Loader2 className="spin" size={18} /> : <WandSparkles size={18} />}
+                生成剧本 YAML
               </button>
               <button className="secondary-button" onClick={handleReset}>
                 <RotateCcw size={18} />
@@ -231,6 +305,7 @@ function App() {
             <p className={error ? "message error" : result.isValid ? "message success" : "message"}>
               {error || result.message}
             </p>
+            {generationMessage ? <p className="message success">{generationMessage}</p> : null}
             <div className="chapter-list">
               {result.chapters.map((chapter) => (
                 <article key={chapter.chapter_id} className="chapter-card">

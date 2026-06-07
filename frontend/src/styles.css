@@ -14,6 +14,7 @@ body {
 }
 
 button,
+input,
 textarea {
   font: inherit;
 }
@@ -126,6 +127,26 @@ h2 {
   margin-bottom: 14px;
 }
 
+.field-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #42505c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  min-height: 42px;
+  margin-bottom: 12px;
+  padding: 0 12px;
+  border: 1px solid #d7dfe7;
+  border-radius: 8px;
+  outline: none;
+  color: #172026;
+  background: #fbfcfe;
+}
+
 textarea {
   width: 100%;
   min-height: 500px;
@@ -139,6 +160,7 @@ textarea {
   background: #fbfcfe;
 }
 
+input:focus,
 textarea:focus {
   border-color: #2f6fed;
   box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.12);
