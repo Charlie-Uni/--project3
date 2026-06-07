@@ -385,15 +385,23 @@ function App() {
             </p>
             {generationMessage ? <p className="message success">{generationMessage}</p> : null}
             <div className="chapter-list">
-              {result.chapters.map((chapter) => (
-                <article key={chapter.chapter_id} className="chapter-card">
-                  <div>
-                    <strong>{chapter.title}</strong>
-                    <span>{chapter.word_count} 字</span>
-                  </div>
-                  <p>{chapter.preview || "该章节暂无正文预览"}</p>
-                </article>
-              ))}
+              {result.chapters.length === 0 && !error ? (
+                <div className="empty-state">
+                  <FileText size={36} className="empty-state-icon" />
+                  <p>粘贴小说文本后点击「校验章节」</p>
+                  <p className="empty-state-hint">支持识别「第 N 章」「Chapter N」等格式，至少需要 3 章</p>
+                </div>
+              ) : (
+                result.chapters.map((chapter) => (
+                  <article key={chapter.chapter_id} className="chapter-card">
+                    <div>
+                      <strong>{chapter.title}</strong>
+                      <span>{chapter.word_count} 字</span>
+                    </div>
+                    <p>{chapter.preview || "该章节暂无正文预览"}</p>
+                  </article>
+                ))
+              )}
             </div>
           </section>
           </div>
