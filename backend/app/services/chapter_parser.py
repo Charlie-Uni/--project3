@@ -44,7 +44,7 @@ def parse_chapters(novel_text: str) -> ChapterParseResult:
         )
 
     chapters = parse_by_headings(normalized_text)
-    if len(chapters) < 3:
+    if not chapters:
         chapters = parse_by_separators(normalized_text)
 
     chapter_count = len(chapters)
