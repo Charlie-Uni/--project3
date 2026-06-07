@@ -6,9 +6,10 @@ import {
   Loader2,
   RotateCcw,
   ScanText,
+  Upload,
   WandSparkles
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   generateScript,
   parseChapters,
@@ -89,6 +90,8 @@ function App() {
   const [yamlResult, setYamlResult] = useState<ValidateYamlData>(EMPTY_YAML_RESULT);
   const [yamlError, setYamlError] = useState("");
   const [isValidatingYaml, setIsValidatingYaml] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canCheck = novelText.trim().length > 0 && !isChecking;
   const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
@@ -334,6 +337,23 @@ function App() {
                   </button>
                 ))}
               </div>
+            </div>
+            <div className="upload-zone">
+              <Upload size={16} />
+              <span className="upload-zone-hint">拖拽 .txt 文件至此，或</span>
+              <button
+                type="button"
+                className="upload-trigger"
+                disabled={isChecking}
+              >
+                点击上传
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".txt"
+                className="file-input-hidden"
+              />
             </div>
             <textarea
               value={novelText}
