@@ -1,5 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
+export type AiProvider = "openai" | "gemini" | "deepseek";
+
 export type ChapterPreview = {
   chapter_id: string;
   title: string;
@@ -57,6 +59,8 @@ export type GenerateScriptData = {
   chapter_count: number;
   word_count: number;
   used_mock: boolean;
+  provider: AiProvider;
+  model: string;
 };
 
 export type ApiResponse<T> = {
@@ -104,7 +108,8 @@ export async function validateYaml(yamlText: string): Promise<ApiResponse<Valida
 export async function generateScript(
   novelText: string,
   sourceTitle: string,
-  targetStyle = "screenplay_yaml"
+  targetStyle = "screenplay_yaml",
+  provider: AiProvider = "openai"
 ): Promise<ApiResponse<GenerateScriptData>> {
   const response = await fetch(`${API_BASE_URL}/api/generate-script`, {
     method: "POST",
@@ -114,7 +119,8 @@ export async function generateScript(
     body: JSON.stringify({
       novel_text: novelText,
       source_title: sourceTitle || "未命名小说",
-      target_style: targetStyle
+      target_style: targetStyle,
+      provider
     })
   });
 

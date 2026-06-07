@@ -166,6 +166,56 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.12);
 }
 
+.provider-selector {
+  margin-bottom: 12px;
+}
+
+.provider-selector > span {
+  display: block;
+  margin-bottom: 8px;
+  color: #42505c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.provider-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.provider-options button {
+  min-height: 58px;
+  padding: 9px 10px;
+  border: 1px solid #d3dbe3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #42505c;
+  text-align: left;
+  cursor: pointer;
+}
+
+.provider-options button.active {
+  border-color: #2357d9;
+  background: #eef3ff;
+  color: #1f4fc5;
+}
+
+.provider-options strong,
+.provider-options small {
+  display: block;
+}
+
+.provider-options strong {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.provider-options small {
+  color: #63717d;
+  font-size: 12px;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -383,5 +433,9 @@ textarea:focus {
 
   textarea {
     min-height: 360px;
+  }
+
+  .provider-options {
+    grid-template-columns: 1fr;
   }
 }

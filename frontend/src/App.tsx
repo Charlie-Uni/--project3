@@ -13,6 +13,7 @@ import {
   generateScript,
   parseChapters,
   validateYaml,
+  type AiProvider,
   type ChapterPreview,
   type ValidateYamlData
 } from "./services/api";
@@ -51,9 +52,32 @@ const EMPTY_YAML_RESULT: ValidateYamlData = {
 
 type WorkMode = "novel" | "yaml";
 
+const AI_PROVIDER_OPTIONS: Array<{ value: AiProvider; label: string; description: string }> = [
+  {
+    value: "openai",
+    label: "OpenAI GPT",
+    description: "通用剧本生成"
+  },
+  {
+    value: "gemini",
+    label: "Gemini",
+    description: "长文本理解"
+  },
+  {
+    value: "deepseek",
+    label: "DeepSeek",
+    description: "低成本生成"
+  }
+];
+
+function getProviderLabel(provider: AiProvider) {
+  return AI_PROVIDER_OPTIONS.find((option) => option.value === provider)?.label || provider;
+}
+
 function App() {
   const [mode, setMode] = useState<WorkMode>("novel");
   const [sourceTitle, setSourceTitle] = useState("雨夜来信");
+  const [selectedProvider, setSelectedProvider] = useState<AiProvider>("openai");
   const [novelText, setNovelText] = useState("");
   const [result, setResult] = useState<ValidationState>(EMPTY_RESULT);
   const [error, setError] = useState("");
@@ -152,7 +176,7 @@ function App() {
     setGenerationMessage("");
 
     try {
-      const response = await generateScript(novelText, sourceTitle);
+      const response = await generateScript(novelText, sourceTitle, "screenplay_yaml", selectedProvider);
       if (!response.success || !response.data) {
         throw new Error(response.error || "AI 剧本生成失败");
       }
@@ -176,8 +200,8 @@ function App() {
       }
       setGenerationMessage(
         response.data.used_mock
-          ? "已使用示例 YAML 生成结果，可在接入 API Key 后切换为真实 AI 生成。"
-          : "AI 剧本 YAML 已生成。"
+          ? `已使用示例 YAML 生成结果。当前选择 ${getProviderLabel(response.data.provider)}，关闭 mock 后将调用 ${response.data.model}。`
+          : `${getProviderLabel(response.data.provider)} 已生成剧本 YAML，使用模型 ${response.data.model}。`
       );
       setMode("yaml");
     } catch (generateError) {
@@ -294,6 +318,22 @@ function App() {
               onChange={(event) => setSourceTitle(event.target.value)}
               placeholder="请输入小说标题"
             />
+            <div className="provider-selector" aria-label="AI 模型选择">
+              <span>AI 模型</span>
+              <div className="provider-options">
+                {AI_PROVIDER_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={selectedProvider === option.value ? "active" : ""}
+                    onClick={() => setSelectedProvider(option.value)}
+                  >
+                    <strong>{option.label}</strong>
+                    <small>{option.description}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
             <textarea
               value={novelText}
               onChange={(event) => setNovelText(event.target.value)}
