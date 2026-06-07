@@ -1,6 +1,6 @@
 import {
-  BookOpen,
   CheckCircle2,
+  Clapperboard,
   Download,
   FileText,
   Loader2,
@@ -18,6 +18,7 @@ import {
   type ChapterPreview,
   type ValidateYamlData
 } from "./services/api";
+import { ParticleBackground } from "./components/ParticleBackground";
 import { StickmanSceneDemo } from "./components/StickmanSceneDemo";
 
 type ValidationState = {
@@ -52,7 +53,7 @@ const EMPTY_YAML_RESULT: ValidateYamlData = {
   scenes_preview: []
 };
 
-type WorkMode = "novel" | "yaml";
+type WorkMode = "novel" | "yaml" | "scene";
 
 const AI_PROVIDER_OPTIONS: Array<{ value: AiProvider; label: string; description: string }> = [
   {
@@ -98,9 +99,17 @@ function App() {
   const canCheck = novelText.trim().length > 0 && !isChecking;
   const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
   const canValidateYaml = yamlText.trim().length > 0 && !isValidatingYaml;
-  const isCurrentModeValid = mode === "yaml" ? yamlResult.is_valid : result.isValid;
+  const isCurrentModeValid =
+    mode === "yaml"
+      ? yamlResult.is_valid
+      : mode === "scene"
+        ? yamlResult.scenes_preview.length > 0
+        : result.isValid;
 
   const statusLabel = useMemo(() => {
+    if (mode === "scene") {
+      return yamlResult.scenes_preview.length > 0 ? "场景演示就绪" : "等待 YAML 校验";
+    }
     if (mode === "yaml") {
       if (isValidatingYaml) return "校验中";
       if (yamlError) return "校验失败";
@@ -110,7 +119,7 @@ function App() {
     if (isChecking) return "校验中";
     if (error) return "校验失败";
     return result.isValid ? "可生成剧本" : "需要补充章节";
-  }, [error, isChecking, isValidatingYaml, mode, result.isValid, yamlError, yamlResult.is_valid]);
+  }, [error, isChecking, isValidatingYaml, mode, result.isValid, yamlError, yamlResult.is_valid, yamlResult.scenes_preview.length]);
 
   async function handleCheck() {
     if (!novelText.trim()) {
@@ -138,27 +147,6 @@ function App() {
     } catch (requestError) {
       setResult(EMPTY_RESULT);
       setError(requestError instanceof Error ? requestError.message : "章节校验失败");
-    } finally {
-      setIsChecking(false);
-    }
-  }
-
-  async function handleLoadSample() {
-    setIsChecking(true);
-    setError("");
-
-    try {
-      const response = await fetch("/sample_novel.txt");
-      if (!response.ok) {
-        throw new Error("示例文本加载失败");
-      }
-      const sampleText = await response.text();
-      setNovelText(sampleText);
-      setSourceTitle("雨夜来信");
-      setResult(EMPTY_RESULT);
-      setGenerationMessage("");
-    } catch (sampleError) {
-      setError(sampleError instanceof Error ? sampleError.message : "示例文本加载失败");
     } finally {
       setIsChecking(false);
     }
@@ -311,32 +299,16 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
-  async function handleLoadSampleYaml() {
-    setIsValidatingYaml(true);
-    setYamlError("");
-
-    try {
-      const response = await fetch("/sample_output.yaml");
-      if (!response.ok) {
-        throw new Error("示例 YAML 加载失败");
-      }
-      const sampleYaml = await response.text();
-      setYamlText(sampleYaml);
-      setYamlResult(EMPTY_YAML_RESULT);
-    } catch (sampleError) {
-      setYamlError(sampleError instanceof Error ? sampleError.message : "示例 YAML 加载失败");
-    } finally {
-      setIsValidatingYaml(false);
-    }
-  }
-
   return (
     <main className="app-shell">
+      <ParticleBackground />
       <section className="workspace">
         <header className="topbar">
           <div>
             <p className="eyebrow">AI 小说转剧本工具</p>
-            <h1>{mode === "novel" ? "小说输入与章节校验" : "YAML Schema 校验"}</h1>
+            <h1>
+              {mode === "novel" ? "小说输入与章节校验" : mode === "yaml" ? "YAML Schema 校验" : "场景演示"}
+            </h1>
           </div>
           <div className={`status-pill ${isCurrentModeValid ? "valid" : "invalid"}`}>
             {statusLabel}
@@ -351,6 +323,10 @@ function App() {
           <button className={mode === "yaml" ? "active" : ""} onClick={() => setMode("yaml")}>
             <CheckCircle2 size={18} />
             YAML Schema 校验
+          </button>
+          <button className={mode === "scene" ? "active" : ""} onClick={() => setMode("scene")}>
+            <Clapperboard size={18} />
+            场景演示
           </button>
         </nav>
 
@@ -420,10 +396,6 @@ function App() {
               spellCheck={false}
             />
             <div className="actions">
-              <button className="secondary-button" onClick={handleLoadSample} disabled={isChecking}>
-                <BookOpen size={18} />
-                加载示例
-              </button>
               <button className="primary-button" disabled={!canCheck} onClick={handleCheck}>
                 {isChecking ? <Loader2 className="spin" size={18} /> : <ScanText size={18} />}
                 校验章节
@@ -471,7 +443,7 @@ function App() {
             </div>
           </section>
           </div>
-        ) : (
+        ) : mode === "yaml" ? (
           <div className="layout-grid">
             <section className="input-panel">
               <div className="panel-heading">
@@ -485,10 +457,6 @@ function App() {
                 spellCheck={false}
               />
               <div className="actions">
-                <button className="secondary-button" onClick={handleLoadSampleYaml} disabled={isValidatingYaml}>
-                  <BookOpen size={18} />
-                  加载示例 YAML
-                </button>
                 <button className="primary-button" disabled={!canValidateYaml} onClick={handleValidateYaml}>
                   {isValidatingYaml ? <Loader2 className="spin" size={18} /> : <CheckCircle2 size={18} />}
                   校验 YAML
@@ -540,7 +508,6 @@ function App() {
                   <p key={validationError}>{validationError}</p>
                 ))}
               </div>
-              <StickmanSceneDemo scenes={yamlResult.scenes_preview} />
               <div className="preview-section">
                 <div className="panel-heading compact-heading">
                   <h2>人物表</h2>
@@ -587,6 +554,17 @@ function App() {
               </div>
             </section>
           </div>
+        ) : (
+          <section className="scene-demo-page">
+            {yamlResult.scenes_preview.length > 0 ? (
+              <StickmanSceneDemo scenes={yamlResult.scenes_preview} />
+            ) : (
+              <div className="scene-demo-empty">
+                <Clapperboard size={48} className="scene-demo-empty-icon" />
+                <p>请先在「YAML Schema 校验」页完成校验，再切换到此页查看场景演示</p>
+              </div>
+            )}
+          </section>
         )}
       </section>
     </main>
