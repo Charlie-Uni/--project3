@@ -125,7 +125,15 @@ http://127.0.0.1:5173/
 
 ## Demo 视频
 
-百度网盘链接：
+Demo 视频链接已放到 README，可直接在线观看，无需下载或注册网盘。
+
+B 站在线观看：
+
+```text
+https://www.bilibili.com/video/BV1UXEx6qEPm/
+```
+
+百度网盘备用链接：
 
 ```text
 https://pan.baidu.com/s/1eAHYJBm45qj5ti3L8HV5AA?pwd=4rm7
