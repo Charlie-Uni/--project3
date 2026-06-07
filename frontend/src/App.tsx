@@ -9,7 +9,7 @@ import {
   Upload,
   WandSparkles
 } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   generateScript,
   parseChapters,
@@ -19,6 +19,7 @@ import {
   type ValidateYamlData
 } from "./services/api";
 import { ParticleBackground } from "./components/ParticleBackground";
+import { ScriptHistoryPanel, type ScriptHistoryItem } from "./components/ScriptHistoryPanel";
 import { StickmanSceneDemo } from "./components/StickmanSceneDemo";
 
 type ValidationState = {
@@ -54,6 +55,9 @@ const EMPTY_YAML_RESULT: ValidateYamlData = {
 };
 
 type WorkMode = "novel" | "yaml" | "scene";
+
+const HISTORY_STORAGE_KEY = "ai-novel-script-history-v1";
+const HISTORY_LIMIT = 5;
 
 const AI_PROVIDER_OPTIONS: Array<{ value: AiProvider; label: string; description: string }> = [
   {
@@ -93,12 +97,14 @@ function App() {
   const [isValidatingYaml, setIsValidatingYaml] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({ type: "idle", message: "" });
   const [isDragOver, setIsDragOver] = useState(false);
+  const [historyItems, setHistoryItems] = useState<ScriptHistoryItem[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canCheck = novelText.trim().length > 0 && !isChecking;
   const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
   const canValidateYaml = yamlText.trim().length > 0 && !isValidatingYaml;
+  const canSaveHistory = yamlText.trim().length > 0 && yamlResult.is_valid;
   const isCurrentModeValid =
     mode === "yaml"
       ? yamlResult.is_valid
@@ -120,6 +126,27 @@ function App() {
     if (error) return "校验失败";
     return result.isValid ? "可生成剧本" : "需要补充章节";
   }, [error, isChecking, isValidatingYaml, mode, result.isValid, yamlError, yamlResult.is_valid, yamlResult.scenes_preview.length]);
+
+  useEffect(() => {
+    try {
+      const rawHistory = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+      if (!rawHistory) {
+        return;
+      }
+      const parsedHistory = JSON.parse(rawHistory);
+      if (Array.isArray(parsedHistory)) {
+        setHistoryItems(parsedHistory.slice(0, HISTORY_LIMIT));
+      }
+    } catch {
+      setHistoryItems([]);
+    }
+  }, []);
+
+  function persistHistory(nextItems: ScriptHistoryItem[]) {
+    const limitedItems = nextItems.slice(0, HISTORY_LIMIT);
+    setHistoryItems(limitedItems);
+    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(limitedItems));
+  }
 
   async function handleCheck() {
     if (!novelText.trim()) {
@@ -297,6 +324,56 @@ function App() {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  }
+
+  function handleSaveHistory() {
+    if (!canSaveHistory) {
+      setYamlError("请先生成并通过 Schema 校验后再保存作品");
+      return;
+    }
+
+    const title = sourceTitle.trim() || "未命名剧本";
+    const nextItem: ScriptHistoryItem = {
+      id: `${Date.now()}`,
+      title,
+      savedAt: new Date().toISOString(),
+      yamlText,
+      characterCount: yamlResult.summary.character_count,
+      sceneCount: yamlResult.summary.scene_count,
+      dialogueCount: yamlResult.summary.dialogue_count
+    };
+    const nextItems = [nextItem, ...historyItems.filter((item) => item.yamlText !== yamlText)];
+    persistHistory(nextItems);
+    setYamlError("");
+  }
+
+  async function handleRestoreHistory(item: ScriptHistoryItem) {
+    setYamlText(item.yamlText);
+    setSourceTitle(item.title === "未命名剧本" ? "" : item.title);
+    setYamlError("");
+    setIsValidatingYaml(true);
+    setMode("yaml");
+
+    try {
+      const response = await validateYaml(item.yamlText);
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "YAML 校验失败");
+      }
+      setYamlResult(response.data);
+    } catch (restoreError) {
+      setYamlResult(EMPTY_YAML_RESULT);
+      setYamlError(restoreError instanceof Error ? restoreError.message : "历史作品恢复失败");
+    } finally {
+      setIsValidatingYaml(false);
+    }
+  }
+
+  function handleDeleteHistory(id: string) {
+    persistHistory(historyItems.filter((item) => item.id !== id));
+  }
+
+  function handleClearHistory() {
+    persistHistory([]);
   }
 
   return (
@@ -501,6 +578,14 @@ function App() {
                   <p key={validationError}>{validationError}</p>
                 ))}
               </div>
+              <ScriptHistoryPanel
+                items={historyItems}
+                canSave={canSaveHistory}
+                onSave={handleSaveHistory}
+                onRestore={handleRestoreHistory}
+                onDelete={handleDeleteHistory}
+                onClear={handleClearHistory}
+              />
 
               {yamlResult.characters_preview.length > 0 && (
                 <div className="preview-section">

@@ -591,6 +591,124 @@ textarea:focus {
   margin-top: 18px;
 }
 
+.history-section {
+  padding: 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: rgba(5, 13, 26, 0.28);
+}
+
+.history-heading,
+.history-actions,
+.history-card-actions {
+  display: flex;
+  align-items: center;
+}
+
+.history-heading {
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.history-actions {
+  gap: 8px;
+}
+
+.history-save-button,
+.history-clear-button,
+.history-card-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: rgba(10, 22, 40, 0.62);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.history-save-button {
+  border-color: rgba(52, 211, 153, 0.35);
+  color: var(--success);
+}
+
+.history-save-button:hover:not(:disabled),
+.history-card-actions button:hover {
+  background: rgba(59, 130, 246, 0.14);
+  border-color: var(--glass-border-hover);
+  color: var(--text-primary);
+}
+
+.history-clear-button:hover:not(:disabled),
+.history-card-actions button.danger:hover {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(248, 113, 113, 0.1);
+  color: var(--error);
+}
+
+.history-save-button:disabled,
+.history-clear-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.history-card {
+  padding: 12px;
+  border: 1px solid var(--glass-border);
+  border-left: 3px solid var(--success);
+  border-radius: 8px;
+  background: rgba(5, 13, 26, 0.44);
+}
+
+.history-card-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.history-card-main strong {
+  color: var(--text-primary);
+}
+
+.history-card-main span {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.history-meta span {
+  padding: 3px 7px;
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 6px;
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--success);
+  font-size: 12px;
+}
+
+.history-card-actions {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .compact-heading {
   margin-bottom: 10px;
 }
@@ -1015,6 +1133,21 @@ textarea:focus {
 
   .provider-options {
     grid-template-columns: 1fr;
+  }
+
+  .history-heading,
+  .history-card-main {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .history-actions {
+    align-items: stretch;
+  }
+
+  .history-save-button,
+  .history-clear-button {
+    flex: 1;
   }
 
   .mini-stage {
