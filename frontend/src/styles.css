@@ -284,10 +284,10 @@ textarea:focus {
   gap: 8px;
   padding: 10px 14px;
   margin-bottom: 10px;
-  border: 1.5px dashed #c8d3dc;
+  border: 1.5px dashed var(--glass-border);
   border-radius: 8px;
-  background: #f9fbfd;
-  color: #63717d;
+  background: rgba(5, 13, 26, 0.42);
+  color: var(--text-secondary);
   font-size: 13px;
   cursor: default;
   transition: border-color 0.15s, background 0.15s;
@@ -295,9 +295,9 @@ textarea:focus {
 }
 
 .upload-zone.drag-over {
-  border-color: #2357d9;
-  background: #eef3ff;
-  color: #1f4fc5;
+  border-color: var(--accent);
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--accent-bright);
 }
 
 .upload-zone-hint {
@@ -308,10 +308,10 @@ textarea:focus {
   flex: none;
   min-height: 30px;
   padding: 0 10px;
-  border: 1px solid #d3dbe3;
+  border: 1px solid var(--glass-border);
   border-radius: 6px;
-  background: #ffffff;
-  color: #172026;
+  background: rgba(10, 22, 40, 0.7);
+  color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
 }
@@ -331,16 +331,16 @@ textarea:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #63717d;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
 .upload-status.success {
-  color: #16714f;
+  color: var(--success);
 }
 
 .upload-status.error {
-  color: #b42318;
+  color: var(--error);
 }
 
 .provider-check {
@@ -486,20 +486,26 @@ textarea:focus {
 
 .yaml-input-panel {
   padding: 18px;
-  border: 1px solid #dfe5ec;
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .yaml-textarea {
   min-height: 220px !important;
+  background: rgba(5, 13, 26, 0.6);
+  color: var(--text-primary);
 }
 
 .yaml-result-panel {
   padding: 18px;
-  border: 1px solid #dfe5ec;
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .yaml-summary-row {
