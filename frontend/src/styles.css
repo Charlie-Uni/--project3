@@ -340,6 +340,7 @@ textarea:focus {
 .chapter-card {
   padding: 14px;
   border: 1px solid #e1e7ee;
+  border-left: 3px solid #2357d9;
   border-radius: 8px;
   background: #ffffff;
   transition: box-shadow 0.18s, transform 0.18s;
@@ -423,6 +424,14 @@ textarea:focus {
 .preview-card:hover {
   box-shadow: 0 4px 12px rgba(23, 32, 38, 0.08);
   transform: translateY(-1px);
+}
+
+.character-grid .preview-card {
+  border-left: 3px solid #7c3aed;
+}
+
+.scene-grid .preview-card {
+  border-left: 3px solid #d97706;
 }
 
 .preview-card div:first-child {
