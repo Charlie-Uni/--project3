@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 CHAPTER_HEADING_PATTERN = re.compile(
-    r"^\s*((?:第[一二三四五六七八九十百千万两0-9\d]+章|Chapter\s+\d+|CHAPTER\s+\d+)[^\n\r]*)\s*$",
+    r"^\s*(?:#+\s*)?((?:第[一二三四五六七八九十百千万两0-9\d]+章|Chapter\s+\d+|CHAPTER\s+\d+)[^\n\r]*)\s*$",
     re.MULTILINE,
 )
 
