@@ -79,7 +79,7 @@ function getProviderLabel(provider: AiProvider) {
 
 function App() {
   const [mode, setMode] = useState<WorkMode>("novel");
-  const [sourceTitle, setSourceTitle] = useState("雨夜来信");
+  const [sourceTitle, setSourceTitle] = useState("");
   const [selectedProvider, setSelectedProvider] = useState<AiProvider>("openai");
   const [novelText, setNovelText] = useState("");
   const [result, setResult] = useState<ValidationState>(EMPTY_RESULT);

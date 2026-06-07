@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
 from backend.app.services.chapter_parser import ChapterParseResult, parse_chapters
@@ -14,6 +15,7 @@ from backend.app.services.yaml_validator import load_script_schema, validate_scr
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+load_dotenv(PROJECT_ROOT / ".env")
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
 SAMPLE_OUTPUT_PATH = PROJECT_ROOT / "examples" / "sample_output.yaml"
 SUPPORTED_PROVIDER_ORDER = ["openai", "gemini", "deepseek"]
