@@ -123,6 +123,20 @@ npm run dev -- --host 127.0.0.1 --port 5173
 http://127.0.0.1:5173/
 ```
 
+## Demo 视频
+
+百度网盘链接：
+
+```text
+https://pan.baidu.com/s/1eAHYJBm45qj5ti3L8HV5AA?pwd=4rm7
+```
+
+提取码：
+
+```text
+4rm7
+```
+
 ## Demo 流程
 
 推荐录屏时使用 `USE_MOCK_AI=true`，避免外部模型网络、额度或输出格式不稳定。
