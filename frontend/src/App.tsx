@@ -5,6 +5,7 @@ import {
   Download,
   FileText,
   Loader2,
+  PlayCircle,
   RotateCcw,
   ScanText,
   WandSparkles
@@ -99,6 +100,7 @@ function App() {
   const canCheck = novelText.trim().length > 0 && !isChecking;
   const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
   const canValidateYaml = yamlText.trim().length > 0 && !isValidatingYaml;
+  const canRunDemo = !isChecking && !isGenerating && !isValidatingYaml;
   const isCurrentModeValid = mode === "yaml" ? yamlResult.is_valid : result.isValid;
 
   const statusLabel = useMemo(() => {
@@ -245,6 +247,80 @@ function App() {
     }
   }
 
+  async function handleRunDemo() {
+    setError("");
+    setYamlError("");
+    setGenerationMessage("");
+    setIsChecking(true);
+
+    try {
+      const sampleResponse = await fetch("/sample_novel.txt");
+      if (!sampleResponse.ok) {
+        throw new Error("示例文本加载失败");
+      }
+
+      const sampleText = await sampleResponse.text();
+      const demoTitle = "雨夜来信";
+      setNovelText(sampleText);
+      setSourceTitle(demoTitle);
+
+      const chapterResponse = await parseChapters(sampleText);
+      if (!chapterResponse.success || !chapterResponse.data) {
+        throw new Error(chapterResponse.error || "章节校验失败");
+      }
+
+      setResult({
+        chapterCount: chapterResponse.data.chapter_count,
+        wordCount: chapterResponse.data.word_count,
+        isValid: chapterResponse.data.is_valid,
+        message: chapterResponse.data.message,
+        chapters: chapterResponse.data.chapters
+      });
+
+      if (!chapterResponse.data.is_valid) {
+        throw new Error(chapterResponse.data.message);
+      }
+
+      setIsChecking(false);
+      setIsGenerating(true);
+
+      const generationResponse = await generateScript(sampleText, demoTitle, "screenplay_yaml", selectedProvider);
+      if (!generationResponse.success || !generationResponse.data) {
+        throw new Error(generationResponse.error || "AI 剧本生成失败");
+      }
+
+      setYamlText(generationResponse.data.yaml_text);
+      const validationResponse = await validateYaml(generationResponse.data.yaml_text);
+      if (validationResponse.success && validationResponse.data) {
+        setYamlResult(validationResponse.data);
+      } else {
+        setYamlResult({
+          ...EMPTY_YAML_RESULT,
+          is_parseable: true,
+          is_valid: generationResponse.data.validation_errors.length === 0,
+          message:
+            generationResponse.data.validation_errors.length === 0
+              ? "AI 生成结果已通过 Schema 校验"
+              : "AI 生成结果未通过 Schema 校验",
+          errors: generationResponse.data.validation_errors,
+          top_level_fields: Object.keys(generationResponse.data.parsed)
+        });
+      }
+
+      setGenerationMessage(
+        generationResponse.data.used_mock
+          ? `已使用示例 YAML 生成结果。当前选择 ${getProviderLabel(generationResponse.data.provider)}，关闭 mock 后将调用 ${generationResponse.data.model}。`
+          : `${getProviderLabel(generationResponse.data.provider)} 已生成剧本 YAML，使用模型 ${generationResponse.data.model}。`
+      );
+      setMode("yaml");
+    } catch (demoError) {
+      setError(demoError instanceof Error ? demoError.message : "一键演示失败");
+    } finally {
+      setIsChecking(false);
+      setIsGenerating(false);
+    }
+  }
+
   async function handleValidateYaml() {
     if (!yamlText.trim()) {
       setYamlError("请输入 YAML 文本");
@@ -320,8 +396,14 @@ function App() {
             <p className="eyebrow">AI 小说转剧本工具</p>
             <h1>{mode === "novel" ? "小说输入与章节校验" : "YAML Schema 校验"}</h1>
           </div>
-          <div className={`status-pill ${isCurrentModeValid ? "valid" : "invalid"}`}>
-            {statusLabel}
+          <div className="topbar-actions">
+            <button className="demo-button" disabled={!canRunDemo} onClick={handleRunDemo}>
+              {isChecking || isGenerating ? <Loader2 className="spin" size={18} /> : <PlayCircle size={18} />}
+              一键演示
+            </button>
+            <div className={`status-pill ${isCurrentModeValid ? "valid" : "invalid"}`}>
+              {statusLabel}
+            </div>
           </div>
         </header>
 

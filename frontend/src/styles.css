@@ -42,6 +42,12 @@ textarea {
   border-left: 4px solid #2357d9;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: #5b6872;
@@ -87,6 +93,33 @@ h2 {
 
 .status-pill.invalid {
   border-color: #e1e7ee;
+}
+
+.demo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #b7e4d1;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #16714f;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.demo-button:hover:not(:disabled) {
+  background: #dcfce7;
+  border-color: #86d9b2;
+  box-shadow: 0 2px 8px rgba(47, 158, 116, 0.2);
+}
+
+.demo-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .layout-grid {
@@ -896,6 +929,17 @@ textarea:focus {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .demo-button,
+  .status-pill {
+    width: 100%;
   }
 
   .layout-grid {
