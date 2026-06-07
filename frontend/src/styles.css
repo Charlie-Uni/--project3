@@ -37,10 +37,18 @@ textarea {
   margin-bottom: 22px;
 }
 
+.topbar > div:first-child {
+  padding-left: 14px;
+  border-left: 4px solid #2357d9;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: #5b6872;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 h1,
@@ -50,11 +58,13 @@ h2 {
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 32px;
+  font-weight: 700;
 }
 
 h2 {
   font-size: 18px;
+  font-weight: 600;
 }
 
 .status-pill {
