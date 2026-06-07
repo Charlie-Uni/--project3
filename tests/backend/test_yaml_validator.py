@@ -19,6 +19,11 @@ def test_validate_sample_output_yaml() -> None:
     }
     assert result.characters_preview[0]["name"] == "林夏"
     assert result.scenes_preview[0]["scene_id"] == "sc_001"
+    assert result.scenes_preview[0]["actions"][0]["actor"] == "林夏"
+    assert result.scenes_preview[0]["narration"][0]["type"] == "voice_over"
+    assert result.scenes_preview[0]["emotions"][0]["character"] == "林夏"
+    assert result.scenes_preview[1]["dialogues"][0]["speaker"] == "林夏"
+    assert result.scenes_preview[1]["transition"]["type"] == "fade_out"
 
 
 def test_validate_yaml_reports_schema_errors() -> None:

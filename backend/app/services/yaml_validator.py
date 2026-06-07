@@ -165,10 +165,92 @@ def extract_scenes_preview(parsed_yaml: dict[str, Any]) -> list[dict[str, Any]]:
                 "summary": str(scene.get("summary", "")),
                 "characters_in_scene": get_list(scene.get("characters_in_scene")),
                 "dialogue_count": len(get_list(scene.get("dialogues"))),
+                "conflicts": to_string_list(scene.get("conflicts"))[:3],
+                "plot_points": to_string_list(scene.get("plot_points"))[:4],
+                "actions": extract_actions_preview(scene),
+                "dialogues": extract_dialogues_preview(scene),
+                "narration": extract_narration_preview(scene),
+                "emotions": extract_emotions_preview(scene),
+                "transition": extract_transition_preview(scene),
             }
         )
 
     return preview
+
+
+def extract_actions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+    actions: list[dict[str, str]] = []
+
+    for action in get_list(scene.get("actions"))[:4]:
+        if not isinstance(action, dict):
+            continue
+        actions.append(
+            {
+                "actor": str(action.get("actor", "未知")),
+                "description": str(action.get("description", "")),
+            }
+        )
+
+    return actions
+
+
+def extract_dialogues_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+    dialogues: list[dict[str, str]] = []
+
+    for dialogue in get_list(scene.get("dialogues"))[:4]:
+        if not isinstance(dialogue, dict):
+            continue
+        dialogues.append(
+            {
+                "speaker": str(dialogue.get("speaker", "未知")),
+                "line": str(dialogue.get("line", "")),
+                "emotion": str(dialogue.get("emotion", "")),
+            }
+        )
+
+    return dialogues
+
+
+def extract_narration_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+    narration_items: list[dict[str, str]] = []
+
+    for narration in get_list(scene.get("narration"))[:3]:
+        if not isinstance(narration, dict):
+            continue
+        narration_items.append(
+            {
+                "type": str(narration.get("type", "")),
+                "text": str(narration.get("text", "")),
+            }
+        )
+
+    return narration_items
+
+
+def extract_emotions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+    emotions: list[dict[str, str]] = []
+
+    for emotion in get_list(scene.get("emotions"))[:4]:
+        if not isinstance(emotion, dict):
+            continue
+        emotions.append(
+            {
+                "character": str(emotion.get("character", "未知")),
+                "emotion": str(emotion.get("emotion", "")),
+                "evidence": str(emotion.get("evidence", "")),
+            }
+        )
+
+    return emotions
+
+
+def extract_transition_preview(scene: dict[str, Any]) -> dict[str, str]:
+    transition = get_dict(scene.get("transitions"))
+    return {
+        "type": str(transition.get("type", "")),
+        "next_scene_id": str(transition.get("next_scene_id", "")),
+        "description": str(transition.get("description", "")),
+    }
 
 
 def get_dict(value: Any) -> dict[str, Any]:
@@ -177,3 +259,7 @@ def get_dict(value: Any) -> dict[str, Any]:
 
 def get_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
+
+
+def to_string_list(value: Any) -> list[str]:
+    return [str(item) for item in get_list(value)]
