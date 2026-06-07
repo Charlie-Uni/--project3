@@ -1,5 +1,4 @@
 import {
-  BookOpen,
   CheckCircle2,
   Download,
   FileText,
@@ -138,27 +137,6 @@ function App() {
     }
   }
 
-  async function handleLoadSample() {
-    setIsChecking(true);
-    setError("");
-
-    try {
-      const response = await fetch("/sample_novel.txt");
-      if (!response.ok) {
-        throw new Error("示例文本加载失败");
-      }
-      const sampleText = await response.text();
-      setNovelText(sampleText);
-      setSourceTitle("雨夜来信");
-      setResult(EMPTY_RESULT);
-      setGenerationMessage("");
-    } catch (sampleError) {
-      setError(sampleError instanceof Error ? sampleError.message : "示例文本加载失败");
-    } finally {
-      setIsChecking(false);
-    }
-  }
-
   function handleReset() {
     setNovelText("");
     setResult(EMPTY_RESULT);
@@ -260,25 +238,6 @@ function App() {
     URL.revokeObjectURL(url);
   }
 
-  async function handleLoadSampleYaml() {
-    setIsValidatingYaml(true);
-    setYamlError("");
-
-    try {
-      const response = await fetch("/sample_output.yaml");
-      if (!response.ok) {
-        throw new Error("示例 YAML 加载失败");
-      }
-      const sampleYaml = await response.text();
-      setYamlText(sampleYaml);
-      setYamlResult(EMPTY_YAML_RESULT);
-    } catch (sampleError) {
-      setYamlError(sampleError instanceof Error ? sampleError.message : "示例 YAML 加载失败");
-    } finally {
-      setIsValidatingYaml(false);
-    }
-  }
-
   return (
     <main className="app-shell">
       <section className="workspace">
@@ -342,10 +301,6 @@ function App() {
               spellCheck={false}
             />
             <div className="actions">
-              <button className="secondary-button" onClick={handleLoadSample} disabled={isChecking}>
-                <BookOpen size={18} />
-                加载示例
-              </button>
               <button className="primary-button" disabled={!canCheck} onClick={handleCheck}>
                 {isChecking ? <Loader2 className="spin" size={18} /> : <ScanText size={18} />}
                 校验章节
@@ -407,10 +362,6 @@ function App() {
                 spellCheck={false}
               />
               <div className="actions">
-                <button className="secondary-button" onClick={handleLoadSampleYaml} disabled={isValidatingYaml}>
-                  <BookOpen size={18} />
-                  加载示例 YAML
-                </button>
                 <button className="primary-button" disabled={!canValidateYaml} onClick={handleValidateYaml}>
                   {isValidatingYaml ? <Loader2 className="spin" size={18} /> : <CheckCircle2 size={18} />}
                   校验 YAML
