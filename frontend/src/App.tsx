@@ -1,9 +1,11 @@
 import {
   BookOpen,
+  Check,
   CheckCircle2,
   Download,
   FileText,
   Loader2,
+  PlayCircle,
   RotateCcw,
   ScanText,
   WandSparkles
@@ -52,6 +54,7 @@ const EMPTY_YAML_RESULT: ValidateYamlData = {
 };
 
 type WorkMode = "novel" | "yaml";
+type WorkflowStepState = "done" | "current" | "pending";
 
 const AI_PROVIDER_OPTIONS: Array<{ value: AiProvider; label: string; description: string }> = [
   {
@@ -75,6 +78,10 @@ function getProviderLabel(provider: AiProvider) {
   return AI_PROVIDER_OPTIONS.find((option) => option.value === provider)?.label || provider;
 }
 
+function getStepClass(state: WorkflowStepState) {
+  return `workflow-step ${state}`;
+}
+
 function App() {
   const [mode, setMode] = useState<WorkMode>("novel");
   const [sourceTitle, setSourceTitle] = useState("雨夜来信");
@@ -93,6 +100,7 @@ function App() {
   const canCheck = novelText.trim().length > 0 && !isChecking;
   const canGenerate = novelText.trim().length > 0 && result.isValid && !isGenerating;
   const canValidateYaml = yamlText.trim().length > 0 && !isValidatingYaml;
+  const canRunDemo = !isChecking && !isGenerating && !isValidatingYaml;
   const isCurrentModeValid = mode === "yaml" ? yamlResult.is_valid : result.isValid;
 
   const statusLabel = useMemo(() => {
@@ -106,6 +114,33 @@ function App() {
     if (error) return "校验失败";
     return result.isValid ? "可生成剧本" : "需要补充章节";
   }, [error, isChecking, isValidatingYaml, mode, result.isValid, yamlError, yamlResult.is_valid]);
+
+  const workflowSteps = useMemo(
+    () =>
+      [
+        {
+          label: "输入小说",
+          state: novelText.trim() ? "done" : "current"
+        },
+        {
+          label: "章节校验",
+          state: result.isValid ? "done" : novelText.trim() ? "current" : "pending"
+        },
+        {
+          label: "生成 YAML",
+          state: yamlText.trim() ? "done" : result.isValid ? "current" : "pending"
+        },
+        {
+          label: "Schema 校验",
+          state: yamlResult.is_valid ? "done" : yamlText.trim() ? "current" : "pending"
+        },
+        {
+          label: "预览导出",
+          state: yamlResult.is_valid ? "current" : "pending"
+        }
+      ] satisfies Array<{ label: string; state: WorkflowStepState }>,
+    [novelText, result.isValid, yamlResult.is_valid, yamlText]
+  );
 
   async function handleCheck() {
     if (!novelText.trim()) {
@@ -212,6 +247,80 @@ function App() {
     }
   }
 
+  async function handleRunDemo() {
+    setError("");
+    setYamlError("");
+    setGenerationMessage("");
+    setIsChecking(true);
+
+    try {
+      const sampleResponse = await fetch("/sample_novel.txt");
+      if (!sampleResponse.ok) {
+        throw new Error("示例文本加载失败");
+      }
+
+      const sampleText = await sampleResponse.text();
+      const demoTitle = "雨夜来信";
+      setNovelText(sampleText);
+      setSourceTitle(demoTitle);
+
+      const chapterResponse = await parseChapters(sampleText);
+      if (!chapterResponse.success || !chapterResponse.data) {
+        throw new Error(chapterResponse.error || "章节校验失败");
+      }
+
+      setResult({
+        chapterCount: chapterResponse.data.chapter_count,
+        wordCount: chapterResponse.data.word_count,
+        isValid: chapterResponse.data.is_valid,
+        message: chapterResponse.data.message,
+        chapters: chapterResponse.data.chapters
+      });
+
+      if (!chapterResponse.data.is_valid) {
+        throw new Error(chapterResponse.data.message);
+      }
+
+      setIsChecking(false);
+      setIsGenerating(true);
+
+      const generationResponse = await generateScript(sampleText, demoTitle, "screenplay_yaml", selectedProvider);
+      if (!generationResponse.success || !generationResponse.data) {
+        throw new Error(generationResponse.error || "AI 剧本生成失败");
+      }
+
+      setYamlText(generationResponse.data.yaml_text);
+      const validationResponse = await validateYaml(generationResponse.data.yaml_text);
+      if (validationResponse.success && validationResponse.data) {
+        setYamlResult(validationResponse.data);
+      } else {
+        setYamlResult({
+          ...EMPTY_YAML_RESULT,
+          is_parseable: true,
+          is_valid: generationResponse.data.validation_errors.length === 0,
+          message:
+            generationResponse.data.validation_errors.length === 0
+              ? "AI 生成结果已通过 Schema 校验"
+              : "AI 生成结果未通过 Schema 校验",
+          errors: generationResponse.data.validation_errors,
+          top_level_fields: Object.keys(generationResponse.data.parsed)
+        });
+      }
+
+      setGenerationMessage(
+        generationResponse.data.used_mock
+          ? `已使用示例 YAML 生成结果。当前选择 ${getProviderLabel(generationResponse.data.provider)}，关闭 mock 后将调用 ${generationResponse.data.model}。`
+          : `${getProviderLabel(generationResponse.data.provider)} 已生成剧本 YAML，使用模型 ${generationResponse.data.model}。`
+      );
+      setMode("yaml");
+    } catch (demoError) {
+      setError(demoError instanceof Error ? demoError.message : "一键演示失败");
+    } finally {
+      setIsChecking(false);
+      setIsGenerating(false);
+    }
+  }
+
   async function handleValidateYaml() {
     if (!yamlText.trim()) {
       setYamlError("请输入 YAML 文本");
@@ -287,10 +396,25 @@ function App() {
             <p className="eyebrow">AI 小说转剧本工具</p>
             <h1>{mode === "novel" ? "小说输入与章节校验" : "YAML Schema 校验"}</h1>
           </div>
-          <div className={`status-pill ${isCurrentModeValid ? "valid" : "invalid"}`}>
-            {statusLabel}
+          <div className="topbar-actions">
+            <button className="demo-button" disabled={!canRunDemo} onClick={handleRunDemo}>
+              {isChecking || isGenerating ? <Loader2 className="spin" size={18} /> : <PlayCircle size={18} />}
+              一键演示
+            </button>
+            <div className={`status-pill ${isCurrentModeValid ? "valid" : "invalid"}`}>
+              {statusLabel}
+            </div>
           </div>
         </header>
+
+        <section className="workflow-steps" aria-label="剧本生成流程">
+          {workflowSteps.map((step, index) => (
+            <div key={step.label} className={getStepClass(step.state)}>
+              <span>{step.state === "done" ? <Check size={14} /> : index + 1}</span>
+              <strong>{step.label}</strong>
+            </div>
+          ))}
+        </section>
 
         <nav className="mode-tabs" aria-label="功能切换">
           <button className={mode === "novel" ? "active" : ""} onClick={() => setMode("novel")}>
@@ -329,6 +453,9 @@ function App() {
                     className={selectedProvider === option.value ? "active" : ""}
                     onClick={() => setSelectedProvider(option.value)}
                   >
+                    {selectedProvider === option.value && (
+                      <Check size={13} className="provider-check" />
+                    )}
                     <strong>{option.label}</strong>
                     <small>{option.description}</small>
                   </button>
@@ -336,6 +463,7 @@ function App() {
               </div>
             </div>
             <textarea
+              className="novel-editor"
               value={novelText}
               onChange={(event) => setNovelText(event.target.value)}
               placeholder="请粘贴至少 3 章小说文本，例如: 第1章 ... 第2章 ... 第3章 ..."
@@ -381,15 +509,23 @@ function App() {
             </p>
             {generationMessage ? <p className="message success">{generationMessage}</p> : null}
             <div className="chapter-list">
-              {result.chapters.map((chapter) => (
-                <article key={chapter.chapter_id} className="chapter-card">
-                  <div>
-                    <strong>{chapter.title}</strong>
-                    <span>{chapter.word_count} 字</span>
-                  </div>
-                  <p>{chapter.preview || "该章节暂无正文预览"}</p>
-                </article>
-              ))}
+              {result.chapters.length === 0 && !error ? (
+                <div className="empty-state">
+                  <FileText size={36} className="empty-state-icon" />
+                  <p>粘贴小说文本后点击「校验章节」</p>
+                  <p className="empty-state-hint">支持识别「第 N 章」「Chapter N」等格式，至少需要 3 章</p>
+                </div>
+              ) : (
+                result.chapters.map((chapter) => (
+                  <article key={chapter.chapter_id} className="chapter-card">
+                    <div>
+                      <strong>{chapter.title}</strong>
+                      <span>{chapter.word_count} 字</span>
+                    </div>
+                    <p>{chapter.preview || "该章节暂无正文预览"}</p>
+                  </article>
+                ))
+              )}
             </div>
           </section>
           </div>
@@ -400,7 +536,9 @@ function App() {
                 <FileText size={20} />
                 <h2>YAML 文本</h2>
               </div>
+              {generationMessage ? <p className="generation-banner">{generationMessage}</p> : null}
               <textarea
+                className="yaml-editor"
                 value={yamlText}
                 onChange={(event) => setYamlText(event.target.value)}
                 placeholder="请粘贴剧本 YAML，用于检查是否符合 schemas/script.schema.yaml"
@@ -468,20 +606,26 @@ function App() {
                   <h2>人物表</h2>
                 </div>
                 <div className="character-grid">
-                  {yamlResult.characters_preview.map((character) => (
-                    <article key={character.name} className="preview-card">
-                      <div>
-                        <strong>{character.name}</strong>
-                        <span>{character.role}</span>
-                      </div>
-                      <p>{character.description || "暂无人物说明"}</p>
-                      <div className="tag-row">
-                        {character.traits.map((trait) => (
-                          <span key={trait}>{trait}</span>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
+                  {yamlResult.characters_preview.length === 0 ? (
+                    <div className="empty-state compact-empty">
+                      <p>暂无人物预览</p>
+                    </div>
+                  ) : (
+                    yamlResult.characters_preview.map((character) => (
+                      <article key={character.name} className="preview-card">
+                        <div>
+                          <strong>{character.name}</strong>
+                          <span>{character.role}</span>
+                        </div>
+                        <p>{character.description || "暂无人物说明"}</p>
+                        <div className="tag-row">
+                          {character.traits.map((trait) => (
+                            <span key={trait}>{trait}</span>
+                          ))}
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
               </div>
               <div className="preview-section">
@@ -489,22 +633,30 @@ function App() {
                   <h2>场景卡片</h2>
                 </div>
                 <div className="scene-grid">
-                  {yamlResult.scenes_preview.map((scene) => (
-                    <article key={scene.scene_id} className="preview-card">
-                      <div>
-                        <strong>{scene.scene_id}</strong>
-                        <span>{scene.source_chapter}</span>
-                      </div>
-                      <p>{scene.location} / {scene.time}</p>
-                      <p>{scene.summary || "暂无场景摘要"}</p>
-                      <div className="tag-row">
-                        {scene.characters_in_scene.map((character) => (
-                          <span key={character}>{character}</span>
-                        ))}
-                        <span>{scene.dialogue_count} 句对白</span>
-                      </div>
-                    </article>
-                  ))}
+                  {yamlResult.scenes_preview.length === 0 ? (
+                    <div className="empty-state compact-empty">
+                      <p>暂无场景预览</p>
+                    </div>
+                  ) : (
+                    yamlResult.scenes_preview.map((scene) => (
+                      <article key={scene.scene_id} className="preview-card">
+                        <div>
+                          <strong>{scene.scene_id}</strong>
+                          <span>{scene.source_chapter}</span>
+                        </div>
+                        <p>{scene.location} / {scene.time}</p>
+                        <p>{scene.summary || "暂无场景摘要"}</p>
+                        {scene.conflicts[0] ? <p className="scene-conflict">冲突：{scene.conflicts[0]}</p> : null}
+                        <div className="tag-row">
+                          {scene.characters_in_scene.map((character) => (
+                            <span key={character}>{character}</span>
+                          ))}
+                          <span>{scene.dialogue_count} 句对白</span>
+                          {scene.transition.type ? <span>转场 {scene.transition.type}</span> : null}
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
               </div>
             </section>
