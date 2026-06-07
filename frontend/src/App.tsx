@@ -16,6 +16,7 @@ import {
   type ChapterPreview,
   type ValidateYamlData
 } from "./services/api";
+import { ParticleBackground } from "./components/ParticleBackground";
 import { StickmanSceneDemo } from "./components/StickmanSceneDemo";
 
 type ValidationState = {
@@ -240,6 +241,7 @@ function App() {
 
   return (
     <main className="app-shell">
+      <ParticleBackground />
       <section className="workspace">
         <header className="topbar">
           <div>
