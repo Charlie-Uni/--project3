@@ -66,6 +66,7 @@ h2 {
   color: #5b6872;
   text-align: center;
   font-size: 14px;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
 
 .status-pill.valid {
@@ -103,6 +104,12 @@ h2 {
   background: #ffffff;
   color: #42505c;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mode-tabs button:hover:not(.active) {
+  background: #f4f6f9;
+  border-color: #b8c2cc;
 }
 
 .mode-tabs button.active {
@@ -234,11 +241,22 @@ textarea:focus {
   border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, border-color 0.15s, opacity 0.15s;
 }
 
 .primary-button {
   background: #2357d9;
   color: #ffffff;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #1a46c0;
+  box-shadow: 0 2px 8px rgba(35, 87, 217, 0.28);
+}
+
+.primary-button:active:not(:disabled) {
+  background: #163aaa;
+  box-shadow: none;
 }
 
 .primary-button:disabled {
@@ -250,6 +268,20 @@ textarea:focus {
   background: #ffffff;
   color: #172026;
   border-color: #d3dbe3;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #f4f6f9;
+  border-color: #b8c2cc;
+}
+
+.secondary-button:active:not(:disabled) {
+  background: #eaecf0;
+}
+
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .metric-grid {
@@ -300,6 +332,12 @@ textarea:focus {
   border: 1px solid #e1e7ee;
   border-radius: 8px;
   background: #ffffff;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+
+.chapter-card:hover {
+  box-shadow: 0 4px 12px rgba(23, 32, 38, 0.08);
+  transform: translateY(-1px);
 }
 
 .chapter-card div {
@@ -369,6 +407,12 @@ textarea:focus {
   border: 1px solid #e1e7ee;
   border-radius: 8px;
   background: #ffffff;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+
+.preview-card:hover {
+  box-shadow: 0 4px 12px rgba(23, 32, 38, 0.08);
+  transform: translateY(-1px);
 }
 
 .preview-card div:first-child {
