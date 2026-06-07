@@ -151,7 +151,16 @@ def extract_characters_preview(parsed_yaml: dict[str, Any]) -> list[dict[str, An
 
 def extract_scenes_preview(parsed_yaml: dict[str, Any]) -> list[dict[str, Any]]:
     scenes = get_list(get_dict(parsed_yaml.get("script")).get("scenes"))
+    char_id_to_name = {
+        c["character_id"]: c["name"]
+        for c in get_list(parsed_yaml.get("characters"))
+        if isinstance(c, dict) and "character_id" in c and "name" in c
+    }
     preview: list[dict[str, Any]] = []
+
+    def resolve_char(val: Any) -> str:
+        s = str(val)
+        return char_id_to_name.get(s, s)
 
     for scene in scenes[:12]:
         if not isinstance(scene, dict):
@@ -163,14 +172,14 @@ def extract_scenes_preview(parsed_yaml: dict[str, Any]) -> list[dict[str, Any]]:
                 "location": str(scene.get("location", "未知")),
                 "time": str(scene.get("time", "未知")),
                 "summary": str(scene.get("summary", "")),
-                "characters_in_scene": get_list(scene.get("characters_in_scene")),
+                "characters_in_scene": [resolve_char(c) for c in get_list(scene.get("characters_in_scene"))],
                 "dialogue_count": len(get_list(scene.get("dialogues"))),
                 "conflicts": to_string_list(scene.get("conflicts"))[:3],
                 "plot_points": to_string_list(scene.get("plot_points"))[:4],
-                "actions": extract_actions_preview(scene),
-                "dialogues": extract_dialogues_preview(scene),
+                "actions": extract_actions_preview(scene, resolve_char),
+                "dialogues": extract_dialogues_preview(scene, resolve_char),
                 "narration": extract_narration_preview(scene),
-                "emotions": extract_emotions_preview(scene),
+                "emotions": extract_emotions_preview(scene, resolve_char),
                 "transition": extract_transition_preview(scene),
             }
         )
@@ -178,7 +187,7 @@ def extract_scenes_preview(parsed_yaml: dict[str, Any]) -> list[dict[str, Any]]:
     return preview
 
 
-def extract_actions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+def extract_actions_preview(scene: dict[str, Any], resolve_char: Any) -> list[dict[str, str]]:
     actions: list[dict[str, str]] = []
 
     for action in get_list(scene.get("actions"))[:4]:
@@ -186,7 +195,7 @@ def extract_actions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
             continue
         actions.append(
             {
-                "actor": str(action.get("actor", "未知")),
+                "actor": resolve_char(action.get("actor", "未知")),
                 "description": str(action.get("description", "")),
             }
         )
@@ -194,7 +203,7 @@ def extract_actions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
     return actions
 
 
-def extract_dialogues_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+def extract_dialogues_preview(scene: dict[str, Any], resolve_char: Any) -> list[dict[str, str]]:
     dialogues: list[dict[str, str]] = []
 
     for dialogue in get_list(scene.get("dialogues"))[:4]:
@@ -202,7 +211,7 @@ def extract_dialogues_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
             continue
         dialogues.append(
             {
-                "speaker": str(dialogue.get("speaker", "未知")),
+                "speaker": resolve_char(dialogue.get("speaker", "未知")),
                 "line": str(dialogue.get("line", "")),
                 "emotion": str(dialogue.get("emotion", "")),
             }
@@ -227,7 +236,7 @@ def extract_narration_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
     return narration_items
 
 
-def extract_emotions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
+def extract_emotions_preview(scene: dict[str, Any], resolve_char: Any) -> list[dict[str, str]]:
     emotions: list[dict[str, str]] = []
 
     for emotion in get_list(scene.get("emotions"))[:4]:
@@ -235,7 +244,7 @@ def extract_emotions_preview(scene: dict[str, Any]) -> list[dict[str, str]]:
             continue
         emotions.append(
             {
-                "character": str(emotion.get("character", "未知")),
+                "character": resolve_char(emotion.get("character", "未知")),
                 "emotion": str(emotion.get("emotion", "")),
                 "evidence": str(emotion.get("evidence", "")),
             }
