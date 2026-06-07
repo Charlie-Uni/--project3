@@ -463,6 +463,7 @@ function App() {
               </div>
             </div>
             <textarea
+              className="novel-editor"
               value={novelText}
               onChange={(event) => setNovelText(event.target.value)}
               placeholder="请粘贴至少 3 章小说文本，例如: 第1章 ... 第2章 ... 第3章 ..."
@@ -535,7 +536,9 @@ function App() {
                 <FileText size={20} />
                 <h2>YAML 文本</h2>
               </div>
+              {generationMessage ? <p className="generation-banner">{generationMessage}</p> : null}
               <textarea
+                className="yaml-editor"
                 value={yamlText}
                 onChange={(event) => setYamlText(event.target.value)}
                 placeholder="请粘贴剧本 YAML，用于检查是否符合 schemas/script.schema.yaml"
@@ -603,20 +606,26 @@ function App() {
                   <h2>人物表</h2>
                 </div>
                 <div className="character-grid">
-                  {yamlResult.characters_preview.map((character) => (
-                    <article key={character.name} className="preview-card">
-                      <div>
-                        <strong>{character.name}</strong>
-                        <span>{character.role}</span>
-                      </div>
-                      <p>{character.description || "暂无人物说明"}</p>
-                      <div className="tag-row">
-                        {character.traits.map((trait) => (
-                          <span key={trait}>{trait}</span>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
+                  {yamlResult.characters_preview.length === 0 ? (
+                    <div className="empty-state compact-empty">
+                      <p>暂无人物预览</p>
+                    </div>
+                  ) : (
+                    yamlResult.characters_preview.map((character) => (
+                      <article key={character.name} className="preview-card">
+                        <div>
+                          <strong>{character.name}</strong>
+                          <span>{character.role}</span>
+                        </div>
+                        <p>{character.description || "暂无人物说明"}</p>
+                        <div className="tag-row">
+                          {character.traits.map((trait) => (
+                            <span key={trait}>{trait}</span>
+                          ))}
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
               </div>
               <div className="preview-section">
@@ -624,22 +633,30 @@ function App() {
                   <h2>场景卡片</h2>
                 </div>
                 <div className="scene-grid">
-                  {yamlResult.scenes_preview.map((scene) => (
-                    <article key={scene.scene_id} className="preview-card">
-                      <div>
-                        <strong>{scene.scene_id}</strong>
-                        <span>{scene.source_chapter}</span>
-                      </div>
-                      <p>{scene.location} / {scene.time}</p>
-                      <p>{scene.summary || "暂无场景摘要"}</p>
-                      <div className="tag-row">
-                        {scene.characters_in_scene.map((character) => (
-                          <span key={character}>{character}</span>
-                        ))}
-                        <span>{scene.dialogue_count} 句对白</span>
-                      </div>
-                    </article>
-                  ))}
+                  {yamlResult.scenes_preview.length === 0 ? (
+                    <div className="empty-state compact-empty">
+                      <p>暂无场景预览</p>
+                    </div>
+                  ) : (
+                    yamlResult.scenes_preview.map((scene) => (
+                      <article key={scene.scene_id} className="preview-card">
+                        <div>
+                          <strong>{scene.scene_id}</strong>
+                          <span>{scene.source_chapter}</span>
+                        </div>
+                        <p>{scene.location} / {scene.time}</p>
+                        <p>{scene.summary || "暂无场景摘要"}</p>
+                        {scene.conflicts[0] ? <p className="scene-conflict">冲突：{scene.conflicts[0]}</p> : null}
+                        <div className="tag-row">
+                          {scene.characters_in_scene.map((character) => (
+                            <span key={character}>{character}</span>
+                          ))}
+                          <span>{scene.dialogue_count} 句对白</span>
+                          {scene.transition.type ? <span>转场 {scene.transition.type}</span> : null}
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
               </div>
             </section>

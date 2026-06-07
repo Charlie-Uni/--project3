@@ -272,6 +272,21 @@ textarea {
   background: #fbfcfe;
 }
 
+.novel-editor {
+  background: #fbfcfe;
+}
+
+.yaml-editor {
+  min-height: 560px;
+  border-color: #cfd8e3;
+  background: #f8fbff;
+  color: #23313d;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
 input:focus,
 textarea:focus {
   border-color: #2f6fed;
@@ -442,6 +457,17 @@ textarea:focus {
   color: #b42318;
 }
 
+.generation-banner {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #b7e4d1;
+  border-radius: 8px;
+  background: #f1fbf6;
+  color: #16714f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .chapter-list {
   display: grid;
   gap: 10px;
@@ -470,6 +496,14 @@ textarea:focus {
 .empty-state-hint {
   font-size: 13px !important;
   color: #9aa8b5 !important;
+}
+
+.compact-empty {
+  min-height: 96px;
+  padding: 24px 16px;
+  border: 1px dashed #d3dbe3;
+  border-radius: 8px;
+  background: #fbfcfe;
 }
 
 .chapter-card {
@@ -580,6 +614,15 @@ textarea:focus {
   margin: 0 0 8px;
   color: #63717d;
   line-height: 1.55;
+}
+
+.preview-card .scene-conflict {
+  padding: 8px 10px;
+  border: 1px solid #f5d08a;
+  border-radius: 8px;
+  background: #fff8e7;
+  color: #7a4f00;
+  font-size: 13px;
 }
 
 .preview-card span {
