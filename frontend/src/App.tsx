@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CheckCircle2,
+  Download,
   FileText,
   Loader2,
   RotateCcw,
@@ -202,6 +203,24 @@ function App() {
     setYamlError("");
   }
 
+  function handleExportYaml() {
+    if (!yamlText.trim()) {
+      setYamlError("请先生成或输入 YAML 文本");
+      return;
+    }
+
+    const blob = new Blob([yamlText], { type: "text/yaml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeTitle = (sourceTitle || "script").trim().replace(/[\\/:*?"<>|]/g, "_");
+    link.href = url;
+    link.download = `${safeTitle || "script"}.yaml`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async function handleLoadSampleYaml() {
     setIsValidatingYaml(true);
     setYamlError("");
@@ -340,6 +359,10 @@ function App() {
                 <button className="primary-button" disabled={!canValidateYaml} onClick={handleValidateYaml}>
                   {isValidatingYaml ? <Loader2 className="spin" size={18} /> : <CheckCircle2 size={18} />}
                   校验 YAML
+                </button>
+                <button className="secondary-button" disabled={!yamlText.trim()} onClick={handleExportYaml}>
+                  <Download size={18} />
+                  导出 YAML
                 </button>
                 <button className="secondary-button" onClick={handleResetYaml}>
                   <RotateCcw size={18} />
